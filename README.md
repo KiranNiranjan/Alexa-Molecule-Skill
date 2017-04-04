@@ -2,7 +2,7 @@
 
 This is a Alexa skill which help Alexa answer simple Molecule details like Bolling point, Melting point etc.
 
-![Alexa Cover]()
+![Alexa Cover](https://raw.githubusercontent.com/KiranNiranjan/Alexa-Molecule-Skill/master/images/alexa-cover.jpg)
 
 ## Authors
 [KiKe](http://kike.co.in)
