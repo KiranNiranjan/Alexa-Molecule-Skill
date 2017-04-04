@@ -18,7 +18,7 @@ var Alexa = require('alexa-sdk');
 var _ = require('lodash');
 var data = require('./data');
 
-exports.handler = function(event, context, callback){
+exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.registerHandlers(handlers);
     alexa.execute();
@@ -39,11 +39,13 @@ var handlers = {
         var moleculeName;
         var moleculeIndex = _.findIndex(this.event.request.intent.slots, {name: 'MoleculeName'});
 
-        if (moleculeIndex != -1){
+        if (moleculeIndex != -1) {
             moleculeName = this.event.request.intent.slots[moleculeIndex].type;
         }
 
         var dataIndex = _.findIndex(data.MOLUCULE_LIST, {IUPACName: moleculeName});
+
+        this.emit(':tell', WELCOME_MESSAGE + data.MOLUCULE_LIST[dataIndex].name);
 
     },
 

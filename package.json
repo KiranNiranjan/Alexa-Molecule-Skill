@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/KiranNiranjan/Alexa-Molecule-Skill#readme",
   "dependencies": {
-    "alexa-sdk": "^1.0.7"
+    "alexa-sdk": "^1.0.7",
+    "lodash": "latest"
   }
 }
