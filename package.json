@@ -1,0 +1,29 @@
+{
+  "name": "alexa-molecule-skill",
+  "version": "1.0.0",
+  "description": "This repository adds new skills to Amazon Alexa",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KiranNiranjan/Alexa-Molecule-Skill.git"
+  },
+  "keywords": [
+    "alexa",
+    "molecule",
+    "amazon",
+    "KiKe",
+    "alexa-skills"
+  ],
+  "author": "KiKe",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/KiranNiranjan/Alexa-Molecule-Skill/issues"
+  },
+  "homepage": "https://github.com/KiranNiranjan/Alexa-Molecule-Skill#readme",
+  "dependencies": {
+    "alexa-sdk": "^1.0.7"
+  }
+}
