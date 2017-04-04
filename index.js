@@ -64,9 +64,10 @@ var newSessionHandlers = {
 
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
 
-    "GetMoleculeIntent": function (slots) {
+    "GetMolecules": function (slots) {
         var moleculeName = slots.MoleculeName.value;
         var moleculeData = [];
+        var _this = this;
 
         data.httpGet(moleculeName, function (result) {
 
@@ -76,17 +77,19 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
 
             if (dataIndex != -1) {
                 if (slots.Properties) {
-                    var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, {valueTitle: slots.Properties.value});
+                    var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
+                        return prop.valueTitle.toLocaleLowerCase() == slots.Properties.value;
+                    });
 
                     var proObj = moleculeData[dataIndex].properties[propertiesIndex];
-                    var speechOutput = this.t('PROPERTIES', proObj.valueTitle, moleculeName, proObj.valueData);
+                    var speechOutput = _this.t("PROPERTIES", proObj.valueTitle, moleculeName, proObj.valueData);
                 }
             }
 
             if (speechOutput) {
-                this.emit(":tell", speechOutput);
+                _this.emit(":tell", speechOutput);
             } else {
-                this.emit(":tell", this.t('WELCOME_MESSAGE'));
+                _this.emit(":tell", _this.t("WELCOME_MESSAGE"));
             }
 
         });
