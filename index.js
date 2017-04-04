@@ -73,7 +73,9 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
 
             moleculeData = result.data;
 
-            var dataIndex = _.findIndex(moleculeData, {IUPACName: moleculeName});
+            var dataIndex = _.findIndex(moleculeData, function (mol) {
+                return mol.IUPACName.toLocaleLowerCase() == moleculeName;
+            });
 
             if (dataIndex != -1) {
                 if (slots.Properties) {
