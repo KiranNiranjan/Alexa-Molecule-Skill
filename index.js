@@ -66,26 +66,30 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
 
     "GetMoleculeIntent": function (slots) {
         var moleculeName = slots.MoleculeName.value;
+        var moleculeData = [];
 
-        var moleculeData = data.httpGet(moleculeName);
+        data.httpGet(moleculeName, function (result) {
 
-        var dataIndex = _.findIndex(moleculeData, {IUPACName: moleculeName});
+            moleculeData = result.data;
 
-        if (dataIndex != -1) {
-            if (slots.Properties) {
-                var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, {valueTitle: slots.Properties.value});
+            var dataIndex = _.findIndex(moleculeData, {IUPACName: moleculeName});
 
-                var proObj = moleculeData[dataIndex].properties[propertiesIndex];
-                var speechOutput = this.t('PROPERTIES', proObj.valueTitle, moleculeName, proObj.valueData);
+            if (dataIndex != -1) {
+                if (slots.Properties) {
+                    var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, {valueTitle: slots.Properties.value});
+
+                    var proObj = moleculeData[dataIndex].properties[propertiesIndex];
+                    var speechOutput = this.t('PROPERTIES', proObj.valueTitle, moleculeName, proObj.valueData);
+                }
             }
-        }
 
-        if (speechOutput) {
-            this.emit(":tell", speechOutput);
-        } else {
-            this.emit(":tell", this.t('WELCOME_MESSAGE'));
-        }
+            if (speechOutput) {
+                this.emit(":tell", speechOutput);
+            } else {
+                this.emit(":tell", this.t('WELCOME_MESSAGE'));
+            }
 
+        });
     }
 });
 
