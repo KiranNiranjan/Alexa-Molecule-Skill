@@ -18,49 +18,50 @@ var Alexa = require('alexa-sdk');
 var _ = require('lodash');
 var data = require('./data');
 
+var MOLECULE_ALEXA_STATE = {
+    START: "STARTMODE",
+    HELP: "HELPMODE"
+};
+
+var languageString = {
+    "en": {
+        "translation": {
+            "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules"
+        }
+    }
+};
+
 exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
-    alexa.registerHandlers(handlers);
+    alexa.resources = languageString;
+    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, triviaStateHandlers, helpStateHandlers);
     alexa.execute();
 };
 
-var WELCOME_MESSAGE = "Welcome to Molecule! You can ask me about any Molecules";
-
-var handlers = {
-
-    'LaunchRequest': function () {
-        this.emit('GetMolecule');
+var newSessionHandlers = {
+    "LaunchRequest": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.START;
+        this.emitWithState("MoleculeStartIntent", true);
     },
-    'GetMoleculeIntent': function () {
-        this.emit('GetMolecule');
+    "AMAZON.StartOverIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.START;
+        this.emitWithState("MoleculeStartIntent", true);
     },
-
-    'GetMolecule': function () {
-        var moleculeName;
-        var moleculeIndex = _.findIndex(this.event.request.intent.slots, {name: 'MoleculeName'});
-
-        if (moleculeIndex != -1) {
-            moleculeName = this.event.request.intent.slots[moleculeIndex].type;
-        }
-
-        var dataIndex = _.findIndex(data.MOLUCULE_LIST, {IUPACName: moleculeName});
-
-        this.emit(':tell', WELCOME_MESSAGE + data.MOLUCULE_LIST[dataIndex].name);
-
+    "AMAZON.HelpIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.HELP;
+        this.emitWithState("helpIntent", true);
     },
-
-    'AMAZON.HelpIntent': function () {
-        const speechOutput = this.t('HELP_MESSAGE');
-        const reprompt = this.t('HELP_MESSAGE');
-        this.emit(':ask', speechOutput, reprompt);
-    },
-    'AMAZON.CancelIntent': function () {
-        this.emit(':tell', this.t('STOP_MESSAGE'));
-    },
-    'AMAZON.StopIntent': function () {
-        this.emit(':tell', this.t('STOP_MESSAGE'));
-    },
-    'SessionEndedRequest': function () {
-        this.emit(':tell', this.t('STOP_MESSAGE'));
+    "Unhandled": function () {
+        var speechOutput = this.t("START_UNHANDLED");
+        this.emit(":ask", speechOutput, speechOutput);
     }
 };
+
+var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
+
+    "MoleculeStartIntent": function () {
+
+        this.emit(":tell", this.t('WELCOME_MESSAGE'));
+
+    }
+});

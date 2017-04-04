@@ -13,11 +13,21 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  **/
-module.exports = {
-    'MOLUCULE_LIST': [
-       {
-           name: 'Methane',
-           bollingPoint: 100
-       }
-   ]
+const request = require('request');
+
+exports.httpGet = function (molecule, callback) {
+
+    var req = {
+        url: 'url' + molecule,
+        method: 'GET'
+    };
+
+    request(req, function optionalCallback(err, httpResponse, body) {
+
+        if (body) {
+            callback(JSON.parse(body));
+        }
+
+    });
+
 };
