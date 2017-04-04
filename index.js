@@ -74,17 +74,19 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
             moleculeData = result.data;
 
             var dataIndex = _.findIndex(moleculeData, function (mol) {
-                return mol.IUPACName.toLocaleLowerCase() == moleculeName;
+                return mol.IUPACName.toLowerCase() == moleculeName.toLowerCase();
             });
 
             if (dataIndex != -1) {
                 if (slots.Properties) {
                     var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
-                        return prop.valueTitle.toLocaleLowerCase() == slots.Properties.value;
+                        return prop.valueTitle.toLowerCase() == slots.Properties.value.toLowerCase();
                     });
 
-                    var proObj = moleculeData[dataIndex].properties[propertiesIndex];
-                    var speechOutput = _this.t("PROPERTIES", proObj.valueTitle, moleculeName, proObj.valueData);
+                    if (propertiesIndex != -1) {
+                        var proObj = moleculeData[dataIndex].properties[propertiesIndex];
+                        var speechOutput = _this.t("PROPERTIES", proObj.valueTitle, moleculeName, proObj.valueData);
+                    }
                 }
             }
 
