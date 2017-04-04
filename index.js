@@ -74,13 +74,13 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
             moleculeData = result.data;
 
             var dataIndex = _.findIndex(moleculeData, function (mol) {
-                return mol.IUPACName.toLocaleLowerCase() == moleculeName;
+                return mol.IUPACName.toLocaleLowerCase() == moleculeName.toLocaleLowerCase();
             });
 
             if (dataIndex != -1) {
                 if (slots.Properties) {
                     var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
-                        return prop.valueTitle.toLocaleLowerCase() == slots.Properties.value;
+                        return prop.valueTitle.toLocaleLowerCase() == slots.Properties.value.toLocaleLowerCase();
                     });
 
                     var proObj = moleculeData[dataIndex].properties[propertiesIndex];
