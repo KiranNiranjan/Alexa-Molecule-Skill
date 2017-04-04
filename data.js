@@ -18,14 +18,14 @@ const request = require('request');
 exports.httpGet = function (molecule, callback) {
 
     var req = {
-        url: 'url' + molecule,
+        url: 'http://molecule.kike.co.in/molecules/search/' + molecule,
         method: 'GET'
     };
 
     request(req, function optionalCallback(err, httpResponse, body) {
 
         if (body) {
-            callback(JSON.parse(body));
+            return callback(JSON.parse(body));
         }
 
     });

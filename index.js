@@ -26,7 +26,8 @@ var MOLECULE_ALEXA_STATE = {
 var languageString = {
     "en": {
         "translation": {
-            "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules"
+            "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
+            "PROPERTIES": "%s of %s is %s"
         }
     }
 };
@@ -34,18 +35,22 @@ var languageString = {
 exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.resources = languageString;
-    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, triviaStateHandlers, helpStateHandlers);
+    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers);
     alexa.execute();
 };
 
 var newSessionHandlers = {
     "LaunchRequest": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
-        this.emitWithState("MoleculeStartIntent", true);
+        this.emitWithState("GetMolecules", this.event.request.intent.slots);
+    },
+    "GetMoleculeIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.START;
+        this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
     "AMAZON.StartOverIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
-        this.emitWithState("MoleculeStartIntent", true);
+        this.emitWithState("GetMolecules", true);
     },
     "AMAZON.HelpIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.HELP;
@@ -59,9 +64,28 @@ var newSessionHandlers = {
 
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
 
-    "MoleculeStartIntent": function () {
+    "GetMoleculeIntent": function (slots) {
+        var moleculeName = slots.MoleculeName.value;
 
-        this.emit(":tell", this.t('WELCOME_MESSAGE'));
+        var moleculeData = data.httpGet(moleculeName);
+
+        var dataIndex = _.findIndex(moleculeData, {IUPACName: moleculeName});
+
+        if (dataIndex != -1) {
+            if (slots.Properties) {
+                var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, {valueTitle: slots.Properties.value});
+
+                var proObj = moleculeData[dataIndex].properties[propertiesIndex];
+                var speechOutput = this.t('PROPERTIES', proObj.valueTitle, moleculeName, proObj.valueData);
+            }
+        }
+
+        if (speechOutput) {
+            this.emit(":tell", speechOutput);
+        } else {
+            this.emit(":tell", this.t('WELCOME_MESSAGE'));
+        }
 
     }
 });
+
