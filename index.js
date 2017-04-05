@@ -27,7 +27,10 @@ var languageString = {
     "en": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
-            "PROPERTIES": "%s of %s is %s"
+            "PROPERTIES": "%s of %s is %s",
+            "CHEMICAL_FORMULA": "%s for %s is %s",
+            "MOLECULE_MESSAGE": "I don't have any information for %s.",
+            "PROPERTIES_MESSAGE": "I don't have any information on %s of %s."
         }
     }
 };
@@ -68,6 +71,7 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         var moleculeName = slots.MoleculeName.value;
         var moleculeData = [];
         var _this = this;
+        var speechOutput;
 
         data.httpGet(moleculeName, function (result) {
 
@@ -84,8 +88,23 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
                     });
 
                     var proObj = moleculeData[dataIndex].properties[propertiesIndex];
-                    var speechOutput = _this.t("PROPERTIES", proObj.valueTitle, moleculeName, proObj.valueData);
+                    speechOutput += _this.t("PROPERTIES", proObj.valueTitle, moleculeName, proObj.valueData);
+
+                } else {
+                    speechOutput += _this.t("PROPERTIES_MESSAGE", slots.Properties.value, moleculeName);
                 }
+
+                if (slots.ChemicalFormula) {
+
+                    var cheObj = moleculeData[dataIndex].chemicalFormula;
+                    speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, cheObj);
+
+                } else {
+                    speechOutput += _this.t("MOLECULE_MESSAGE", moleculeName);
+                }
+
+            } else {
+                speechOutput += _this.t("MOLECULE_MESSAGE", moleculeName);
             }
 
             if (speechOutput) {
