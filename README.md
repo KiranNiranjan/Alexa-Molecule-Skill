@@ -1,4 +1,4 @@
-# Molecule Alexa Skill
+# Molecule Alexa Skill <img alt="Molecule Icon" src="https://raw.githubusercontent.com/KiranNiranjan/Alexa-Molecule-Skill/master/images/molecule_for_alexa.png" width="48"> 
 
 This is a Alexa skill which help Alexa answer simple Molecule details like Bolling point, Melting point etc.
 
