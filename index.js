@@ -29,8 +29,8 @@ var languageString = {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
-            "MOLECULE_MESSAGE": "I don't have any information for %s.",
-            "PROPERTIES_MESSAGE": "I don't have any information on %s of %s."
+            "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
+            "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s."
         }
     }
 };
@@ -82,7 +82,7 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
             });
 
             if (dataIndex != -1) {
-                if (slots.Properties) {
+                if (slots.Properties && slots.Properties.value) {
                     var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
                         return prop.valueTitle.toLowerCase() == slots.Properties.value.toLowerCase();
                     });
@@ -90,21 +90,21 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
                     var proObj = moleculeData[dataIndex].properties[propertiesIndex];
                     speechOutput += _this.t("PROPERTIES", proObj.valueTitle, moleculeName, proObj.valueData);
 
-                } else {
-                    speechOutput += _this.t("PROPERTIES_MESSAGE", slots.Properties.value, moleculeName);
+                    if (propertiesIndex == -1) {
+                        speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
+                    }
+
                 }
 
-                if (slots.ChemicalFormula) {
+                if (slots.ChemicalFormula && slots.ChemicalFormula.value) {
 
                     var cheObj = moleculeData[dataIndex].chemicalFormula;
                     speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, cheObj);
 
-                } else {
-                    speechOutput += _this.t("MOLECULE_MESSAGE", moleculeName);
                 }
 
             } else {
-                speechOutput += _this.t("MOLECULE_MESSAGE", moleculeName);
+                speechOutput += _this.t("MOLECULE_ERROR_MESSAGE", moleculeName);
             }
 
             if (speechOutput) {
