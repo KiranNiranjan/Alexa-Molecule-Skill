@@ -16,10 +16,13 @@
 'use strict';
 var Alexa = require('alexa-sdk');
 var _ = require('lodash');
-var data = require('./data');
+
+var data = require('./data'),
+    helpers = require('./helpers');
 
 var MOLECULE_ALEXA_STATE = {
     START: "STARTMODE",
+    QUESTION: "QUESTIONMODE",
     HELP: "HELPMODE"
 };
 
@@ -39,7 +42,7 @@ var languageString = {
 exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.resources = languageString;
-    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers);
+    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers);
     alexa.execute();
 };
 
@@ -48,8 +51,12 @@ var newSessionHandlers = {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
-    "GetMoleculeIntent": function () {
+    "StartMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
+        this.emitWithState("StartMolecules", this.event.request.intent.slots);
+    },
+    "GetMoleculeIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
     "AMAZON.StartOverIntent": function () {
@@ -67,6 +74,25 @@ var newSessionHandlers = {
 };
 
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
+    "StartMolecules": function () {
+        this.emit(":ask", this.t("WELCOME_MESSAGE"), this.t("HELP_MESSAGE"));
+        this.emitWithState("GetMolecules", this.event.request.intent.slots);
+    },
+    "AMAZON.StartOverIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.START;
+        this.emitWithState("GetMolecules", true);
+    },
+    "AMAZON.HelpIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.HELP;
+        this.emitWithState("helpIntent", true);
+    },
+    "Unhandled": function () {
+        var speechOutput = this.t("START_UNHANDLED");
+        this.emit(":ask", speechOutput, speechOutput);
+    }
+});
+
+var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUESTION, {
 
     "GetMolecules": function (slots) {
         var moleculeName = slots.MoleculeName.value;
@@ -108,8 +134,9 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
                  * Handle chemical formula request
                  * **/
                 if (slots.ChemicalFormula && slots.ChemicalFormula.value) {
-                    var chemicalFormula = moleculeData[dataIndex].chemicalFormula;
-                    speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormula.split('').join(' '));
+                    var chemicalFormulaLong = moleculeData[dataIndex].chemicalFormulaLong;
+                    var chemicalFormulaForSpeech = helpers.chemicalFormulaToReadable(chemicalFormulaLong);
+                    speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormulaForSpeech);
                 }
 
                 /**
