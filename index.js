@@ -72,7 +72,7 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         var moleculeName = slots.MoleculeName.value;
         var moleculeData = [];
         var _this = this;
-        var speechOutput;
+        var speechOutput = "";
 
         data.httpGet(moleculeName, function (result) {
 
@@ -95,10 +95,13 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
                         return prop.valueTitle.toLowerCase() == slots.Properties.value.toLowerCase();
                     });
 
-                    var proObj = moleculeData[dataIndex].properties[propertiesIndex];
-                    speechOutput += _this.t("PROPERTIES", proObj.valueTitle, moleculeName, proObj.valueData);
+                    if (propertiesIndex == -1) {
+                        speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
+                    } else {
+                        var properties = moleculeData[dataIndex].properties[propertiesIndex];
+                        speechOutput += _this.t("PROPERTIES", properties.valueTitle, moleculeName, properties.valueData);
+                    }
 
-                    if (propertiesIndex == -1) speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
                 }
 
                 /**
@@ -106,7 +109,7 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
                  * **/
                 if (slots.ChemicalFormula && slots.ChemicalFormula.value) {
                     var chemicalFormula = moleculeData[dataIndex].chemicalFormula;
-                    speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormula);
+                    speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormula.split('').join(' '));
                 }
 
                 /**
