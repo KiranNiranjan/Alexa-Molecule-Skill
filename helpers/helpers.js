@@ -35,7 +35,5 @@ exports.chemicalFormulaToReadable = function (string) {
         }
     });
 
-    return "<say-as interpret-as=“spell-out”>" + result + "</say-as>";
+    return "<say-as interpret-as='spell-out'>" + result + "</say-as>";
 };
-
-console.log(exports.chemicalFormulaToReadable("NaHSOOO"));

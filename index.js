@@ -48,6 +48,10 @@ exports.handler = function (event, context, callback) {
 };
 
 var newSessionHandlers = {
+    "LaunchRequest": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.START;
+        this.emitWithState("StartMolecules");
+    },
     "StartMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
         this.emitWithState("StartMolecules");
@@ -56,9 +60,9 @@ var newSessionHandlers = {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
-    "AMAZON.StartOverIntent": function () {
+    "AnswerIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
-        this.emitWithState("GetMolecules", true);
+        this.emitWithState("StartMolecules");
     },
     "AMAZON.HelpIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.HELP;
@@ -95,6 +99,7 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         var moleculeData = [];
         var _this = this;
         var speechOutput = "";
+
 
         Data.httpGet(moleculeName, function (result) {
 
