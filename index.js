@@ -30,7 +30,8 @@ var languageString = {
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
-            "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s."
+            "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
+            "NOTHING_FOUND": "Sorry! I din't catch that. Please try again"
         }
     }
 };
@@ -81,7 +82,14 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
                 return mol.IUPACName.toLowerCase() == moleculeName.toLowerCase();
             });
 
+            /**
+             * Handle molecule request
+             * **/
             if (dataIndex != -1) {
+
+                /**
+                 * Handle properties request
+                 * **/
                 if (slots.Properties && slots.Properties.value) {
                     var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
                         return prop.valueTitle.toLowerCase() == slots.Properties.value.toLowerCase();
@@ -90,17 +98,22 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
                     var proObj = moleculeData[dataIndex].properties[propertiesIndex];
                     speechOutput += _this.t("PROPERTIES", proObj.valueTitle, moleculeName, proObj.valueData);
 
-                    if (propertiesIndex == -1) {
-                        speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
-                    }
-
+                    if (propertiesIndex == -1) speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
                 }
 
+                /**
+                 * Handle chemical formula request
+                 * **/
                 if (slots.ChemicalFormula && slots.ChemicalFormula.value) {
+                    var chemicalFormula = moleculeData[dataIndex].chemicalFormula;
+                    speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormula);
+                }
 
-                    var cheObj = moleculeData[dataIndex].chemicalFormula;
-                    speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, cheObj);
-
+                /**
+                 * Handle speech is undefined
+                 * **/
+                if (!speechOutput) {
+                    speechOutput += _this.t("NOTHING_FOUND");
                 }
 
             } else {
