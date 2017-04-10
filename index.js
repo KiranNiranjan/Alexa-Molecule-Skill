@@ -64,7 +64,7 @@ var newSessionHandlers = {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
-        var speechOutput = this.t("START_UNHANDLED");
+        var speechOutput = this.t("NOTHING_FOUND");
         this.emit(":ask", speechOutput, speechOutput);
     }
 };
@@ -81,7 +81,7 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
-        var speechOutput = this.t("START_UNHANDLED");
+        var speechOutput = this.t("NOTHING_FOUND");
         this.emit(":ask", speechOutput, speechOutput);
     }
 });
@@ -120,6 +120,7 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
                         speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
                     } else {
                         var properties = moleculeData[dataIndex].properties[propertiesIndex];
+                        if (properties.valueTitle == "Density" || properties.valueTitle == "Molar mass") properties.valueData = properties.valueData.replace(/−/g, ' ');
                         speechOutput += _this.t("PROPERTIES", properties.valueTitle, moleculeName, properties.valueData);
                     }
 
@@ -157,7 +158,7 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
-        var speechOutput = this.t("START_UNHANDLED");
+        var speechOutput = this.t("NOTHING_FOUND");
         this.emit(":ask", speechOutput, speechOutput);
     }
 });
