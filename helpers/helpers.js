@@ -28,15 +28,14 @@ exports.chemicalFormulaToReadable = function (string) {
 
     _.mapKeys(count, function (val, key) {
 
-        if (key.length > 1) {
-            key = key.split('').join(' ');
-        }
         if (val == 1) {
-            return result += key + ',';
+            return result += key;
         } else {
-            return result += key + val + ',';
+            return result += key + val;
         }
     });
 
-    return result.substr(0, result.length - 1);
+    return "<say-as interpret-as=“spell-out”>" + result + "</say-as>";
 };
+
+console.log(exports.chemicalFormulaToReadable("NaHSOOO"));

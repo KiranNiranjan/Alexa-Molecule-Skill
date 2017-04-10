@@ -17,8 +17,8 @@
 var Alexa = require('alexa-sdk');
 var _ = require('lodash');
 
-var data = require('./data'),
-    helpers = require('./helpers/helpers');
+var Data = require('./data'),
+    Helpers = require('./helpers/helpers');
 
 var MOLECULE_ALEXA_STATE = {
     START: "STARTMODE",
@@ -96,7 +96,7 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         var _this = this;
         var speechOutput = "";
 
-        data.httpGet(moleculeName, function (result) {
+        Data.httpGet(moleculeName, function (result) {
 
             moleculeData = result.data;
 
@@ -131,7 +131,7 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
                  * **/
                 if (slots.ChemicalFormula && slots.ChemicalFormula.value) {
                     var chemicalFormulaLong = moleculeData[dataIndex].chemicalFormulaLong;
-                    var chemicalFormulaForSpeech = helpers.chemicalFormulaToReadable(chemicalFormulaLong);
+                    var chemicalFormulaForSpeech = Helpers.chemicalFormulaToReadable(chemicalFormulaLong);
                     speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormulaForSpeech);
                 }
 
