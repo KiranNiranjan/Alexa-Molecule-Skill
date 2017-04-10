@@ -18,7 +18,7 @@ var Alexa = require('alexa-sdk');
 var _ = require('lodash');
 
 var data = require('./data'),
-    helpers = require('./helpers');
+    helpers = require('./helpers/helpers');
 
 var MOLECULE_ALEXA_STATE = {
     START: "STARTMODE",
@@ -30,6 +30,7 @@ var languageString = {
     "en": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
+            "HELP_MESSAGE": "Try saying, Boiling point of methane",
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
@@ -47,13 +48,9 @@ exports.handler = function (event, context, callback) {
 };
 
 var newSessionHandlers = {
-    "LaunchRequest": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.START;
-        this.emitWithState("GetMolecules", this.event.request.intent.slots);
-    },
     "StartMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
-        this.emitWithState("StartMolecules", this.event.request.intent.slots);
+        this.emitWithState("StartMolecules");
     },
     "GetMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
@@ -76,7 +73,6 @@ var newSessionHandlers = {
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
     "StartMolecules": function () {
         this.emit(":ask", this.t("WELCOME_MESSAGE"), this.t("HELP_MESSAGE"));
-        this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
     "AMAZON.StartOverIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
