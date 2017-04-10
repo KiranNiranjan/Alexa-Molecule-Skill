@@ -30,7 +30,7 @@ var languageString = {
     "en": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
-            "HELP_MESSAGE": "Try saying, Boiling point of methane",
+            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or What is the chemical formula of carbon dioxide",
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
@@ -60,13 +60,8 @@ var newSessionHandlers = {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
-    "AnswerIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.START;
-        this.emitWithState("StartMolecules");
-    },
     "AMAZON.HelpIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.HELP;
-        this.emitWithState("helpIntent", true);
+        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
         var speechOutput = this.t("START_UNHANDLED");
@@ -76,15 +71,14 @@ var newSessionHandlers = {
 
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
     "StartMolecules": function () {
-        this.emit(":ask", this.t("WELCOME_MESSAGE"), this.t("HELP_MESSAGE"));
+        this.emit(":ask", this.t("WELCOME_MESSAGE") + this.t("HELP_MESSAGE"));
     },
-    "AMAZON.StartOverIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.START;
-        this.emitWithState("GetMolecules", true);
+    "GetMoleculeIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
+        this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
     "AMAZON.HelpIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.HELP;
-        this.emitWithState("helpIntent", true);
+        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
         var speechOutput = this.t("START_UNHANDLED");
@@ -158,6 +152,13 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
             }
 
         });
+    },
+    "AMAZON.HelpIntent": function () {
+        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+    },
+    "Unhandled": function () {
+        var speechOutput = this.t("START_UNHANDLED");
+        this.emit(":ask", speechOutput, speechOutput);
     }
 });
 
