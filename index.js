@@ -21,9 +21,9 @@ var Data = require('./data'),
     Helpers = require('./helpers/helpers');
 
 var MOLECULE_ALEXA_STATE = {
-    START: "STARTMODE",
-    QUESTION: "QUESTIONMODE",
-    HELP: "HELPMODE"
+    START: "START_MODE",
+    QUESTION: "QUESTION_MODE",
+    HELP: "HELP_MODE"
 };
 
 var languageString = {
@@ -37,7 +37,30 @@ var languageString = {
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
             "NOTHING_FOUND": "Sorry! I din't catch that. Please try again"
         }
+    },
+    "en-GB": {
+        "translation": {
+            "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
+            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or What is the chemical formula of carbon dioxide",
+            "PROPERTIES": "%s of %s is %s",
+            "CHEMICAL_FORMULA": "%s for %s is %s",
+            "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
+            "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
+            "NOTHING_FOUND": "Sorry! I din't catch that. Please try again"
+        }
+    },
+    "de": {
+        "translation": {
+            "WELCOME_MESSAGE": "Welkom bij Molecule! Je kunt me vragen naar Molecules",
+            "HELP_MESSAGE": "Probeer te zeggen wat zoiets, kookpunt van methane of Wat is de chemische formule van carbon dioxide",
+            "PROPERTIES": "%s van %s is %s",
+            "CHEMICAL_FORMULA": "%s voor %s is %s",
+            "MOLECULE_ERROR_MESSAGE": "Ik heb geen informatie over hebben %s.",
+            "PROPERTIES_ERROR_MESSAGE": "Ik heb geen informatie over hebben %s van %s.",
+            "NOTHING_FOUND": "Sorry! Ik heb niet verstaan. Probeer het opnieuw"
+        }
     }
+
 };
 
 exports.handler = function (event, context, callback) {
