@@ -23,10 +23,12 @@ var Data = require('./data'),
 var MOLECULE_ALEXA_STATE = {
     START: "START_MODE",
     QUESTION: "QUESTION_MODE",
+    QUIZ: "QUIZ_MODE",
     HELP: "HELP_MODE"
 };
 
 var speechOutput = "";
+var question = "";
 
 var languageString = {
     "en": {
@@ -38,7 +40,8 @@ var languageString = {
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
             "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
-            "GOOD_BYE": "Goodbye! Have a nice day"
+            "GOOD_BYE": "Goodbye! Have a nice day",
+            "START_QUIZ_MESSAGE": "OK. I will ask you 10 questions about Molecules."
         }
     },
     "en-US": {
@@ -50,7 +53,8 @@ var languageString = {
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
             "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
-            "GOOD_BYE": "Goodbye! Have a nice day"
+            "GOOD_BYE": "Goodbye! Have a nice day",
+            "START_QUIZ_MESSAGE": "OK. I will ask you 10 questions about Molecules."
         }
     },
     "en-GB": {
@@ -62,28 +66,87 @@ var languageString = {
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
             "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
-            "GOOD_BYE": "Goodbye! Have a nice day"
+            "GOOD_BYE": "Goodbye! Have a nice day",
+            "START_QUIZ_MESSAGE": "OK. I will ask you 10 questions about Molecules."
         }
     },
-    "de": {
+    "de-DE": {
         "translation": {
-            "WELCOME_MESSAGE": "Welkom bij Molecule! Je kunt me vragen naar Molecules",
-            "HELP_MESSAGE": "Probeer te zeggen wat zoiets, kookpunt van methane of Wat is de chemische formule van carbon dioxide",
-            "PROPERTIES": "%s van %s is %s",
-            "CHEMICAL_FORMULA": "%s voor %s is %s",
-            "MOLECULE_ERROR_MESSAGE": "Ik heb geen informatie over hebben %s.",
-            "PROPERTIES_ERROR_MESSAGE": "Ik heb geen informatie over hebben %s van %s.",
-            "NOTHING_FOUND": "Sorry! Ik heb niet verstaan. Probeer het opnieuw",
-            "GOOD_BYE": "Vaarwel! Fijne dag"
+            "WELCOME_MESSAGE": "Willkommen bei Molecule! Du kannst mich nach irgendwelchen Molekülen fragen",
+            "HELP_MESSAGE": "Versuchen Sie, etwas zu sagen, Siedepunkt von Methane oder Was ist die chemische Formel von carbon dioxide",
+            "PROPERTIES": "%s von %s Ist %s",
+            "CHEMICAL_FORMULA": "%s zum %s Ist %s",
+            "MOLECULE_ERROR_MESSAGE": "Ich habe keine Informationen für %s.",
+            "PROPERTIES_ERROR_MESSAGE": "Ich habe keine Informationen über %s von %s.",
+            "NOTHING_FOUND": "Es tut uns leid! Ich habe das nicht gefangen. Bitte versuche es erneut",
+            "GOOD_BYE": "Auf Wiedersehen! Einen schönen Tag noch",
+            "START_QUIZ_MESSAGE": "OK. Ich werde euch 10 Fragen über Molecules stellen."
         }
     }
-
 };
+
+var molecules = [
+    "Nitrogen",
+    "CarbonMonoxide",
+    "Carbon dioxide",
+    "Cyanide",
+    "Hydrogen Cyanide",
+    "Cyanogen",
+    "Nitrous oxide",
+    "Nitrate",
+    "Nitrogen monohydride",
+    "Ammonia",
+    "Formic acid",
+    "Cyanamide",
+    "Isocyanic acid",
+    "Hydrazine ",
+    "Hydrazoic acid",
+    "Nitric acid",
+    "Nitrous acid",
+    "Ozone",
+    "Oxygen",
+    "Carbonic acid ",
+    "Peroxynitric acid",
+    "Fluorine",
+    "Hydrogen fluoride",
+    "Hypofluorous acid",
+    "Ammonium bifluoride",
+    "Carbonyl fluoride",
+    "Tetrafluoromethane",
+    "Fluoroform",
+    "Difluoromethane",
+    "tetrafluoroethylene",
+    "Fluorine azide",
+    "Fluorine nitrate",
+    "Nitrogen trifluoride",
+    "Nitrosyl fluoride",
+    "Nitryl fluoride",
+    "Dinitrogen difluoride",
+    "Tetrafluorohydrazine",
+    "Ammonium fluoride",
+    "Oxygen difluoride"
+];
+
+var properties = [
+    "Molar mass",
+    "Boiling point",
+    "Melting point",
+    "Autoignition temperature",
+    "Odor",
+    "Solubility",
+    "Density",
+    "Phase",
+    "Triple point",
+    "Critical point",
+    "Atomic number",
+    "Atomic mass",
+    "Smell"
+];
 
 exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.resources = languageString;
-    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers);
+    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers, quizMoleculeHandlers);
     alexa.execute();
 };
 
@@ -99,6 +162,10 @@ var newSessionHandlers = {
     "GetMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
+    },
+    "QuizMoleculeIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
+        this.emitWithState("StartQuiz");
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
@@ -123,6 +190,10 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
+    "QuizMoleculeIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
+        this.emitWithState("StartQuiz");
+    },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
@@ -136,6 +207,59 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         var speechOutput = this.t("NOTHING_FOUND");
         this.emit(":ask", speechOutput, speechOutput);
     }
+});
+
+var quizMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUIZ, {
+
+    "StartQuiz": function () {
+        this.attributes["response"] = "";
+        this.attributes["quizCounter"] = 0;
+        this.attributes["quizScore"] = 0;
+        this.emitWithState("AskQuestion");
+        question = ""
+    },
+
+    "AskQuestion": function () {
+        var _this = this;
+
+        if (this.attributes["quizCounter"] == 0) {
+            this.attributes["response"] = _this.t("START_QUIZ_MESSAGE")
+        }
+
+        var moleculesIndex = _.random(0, molecules.length - 1);
+        var propertyIndex = _.random(0, properties.length - 1);
+
+        var molecule = molecules[moleculesIndex];
+        var property = properties[propertyIndex];
+
+        this.attributes["quizQuestion"] = molecule;
+        this.attributes["property"] = property;
+        this.attributes["quizCounter"]++;
+
+        question += Helpers.generateQuestion(this.attributes["quizCounter"], property, molecule);
+
+        this.emit(":ask", question, question);
+    },
+
+    "AnswerIntent": function () {
+        this.emit(":tell", question);
+    },
+
+    "AMAZON.HelpIntent": function () {
+        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+    },
+    'AMAZON.StopIntent': function () {
+        this.emit(':tell', this.t("GOOD_BYE"));
+    },
+    'AMAZON.RepeatIntent': function () {
+        if (!question) question = this.t("HELP_MESSAGE");
+        this.emit(':ask', question, this.t("HELP_MESSAGE"));
+    },
+    "Unhandled": function () {
+        this.emitWithState("AnswerIntent");
+    }
+
+
 });
 
 var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUESTION, {
