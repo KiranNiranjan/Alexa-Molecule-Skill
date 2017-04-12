@@ -47,3 +47,24 @@ exports.unitsToReadable = function (string) {
 
 };
 
+// Method to provide a random example
+exports.examples = function () {
+
+    var examples = [
+        "What is the atomic number for Carbon?",
+        "What is the boiling point for Water?",
+        "Odor for Hydrogen cyanide?",
+        "How does Formic acid looks like?",
+        "Chemical Formula of Fluorine?",
+        "What is the chemical formula of Benzene?",
+        "What is the autoignition temperature of Carbon Monoxide?",
+        "How does Ammonia smells like?", // TODO add smells like intent
+        "Does Ammonia soluble in water?",
+        "How does Fluoroform looks like or  appears like?", // TODO add looks like intent
+        "What are the Hazards of Difluoromethane?",
+        "Melting point for Sodium fluoride?",
+        "What is the Flash point of Sodium nitrate?",
+        "What is the density of Sodium?"
+    ]
+
+};

@@ -32,11 +32,17 @@ var languageString = {
     "en": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
-            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or What is the chemical formula of carbon dioxide",
+            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or  What is the chemical formula of carbon dioxide",
+
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
+            "SOLUBILITY_NOT_FOUND": "I don't think %s soluble in %s. But %s is soluble in %s",
+            "SOLUBLE_MESSAGE": "Yes, %s is soluble in %s",
+
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
+
+            "EXAMPLE": "%s",
             "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
             "GOOD_BYE": "Goodbye! Have a nice day"
         }
@@ -44,7 +50,7 @@ var languageString = {
     "en-US": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
-            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or What is the chemical formula of carbon dioxide",
+            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or  What is the chemical formula of carbon dioxide",
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
@@ -56,7 +62,7 @@ var languageString = {
     "en-GB": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
-            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or What is the chemical formula of carbon dioxide",
+            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or  What is the chemical formula of carbon dioxide",
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
@@ -68,7 +74,7 @@ var languageString = {
     "de": {
         "translation": {
             "WELCOME_MESSAGE": "Welkom bij Molecule! Je kunt me vragen naar Molecules",
-            "HELP_MESSAGE": "Probeer te zeggen wat zoiets, kookpunt van methane of Wat is de chemische formule van carbon dioxide",
+            "HELP_MESSAGE": "Probeer te zeggen wat zoiets, kookpunt van methane of  Wat is de chemische formule van carbon dioxide",
             "PROPERTIES": "%s van %s is %s",
             "CHEMICAL_FORMULA": "%s voor %s is %s",
             "MOLECULE_ERROR_MESSAGE": "Ik heb geen informatie over hebben %s.",
@@ -80,7 +86,7 @@ var languageString = {
 
 };
 
-exports.handler = function (event, context, callback) {
+exports.handler = function (event, context) {
     var alexa = Alexa.handler(event, context);
     alexa.resources = languageString;
     alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers);
@@ -99,6 +105,10 @@ var newSessionHandlers = {
     "GetMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
+    },
+    "ExampleMoleculeIntent": function () {
+        // TODO: Examples
+        this.emitWithState("GetMoleculesExamples");
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
@@ -123,6 +133,10 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
+    "SolubilityIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
+        this.emitWithState("GetSoluble", this.event.request.intent.slots);
+    },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
@@ -139,6 +153,10 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
 });
 
 var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUESTION, {
+
+    /**
+     * Method to process Molecule Question Intent
+     */
 
     "GetMolecules": function (slots) {
         var moleculeName = slots.MoleculeName.value;
@@ -183,6 +201,80 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
                     var chemicalFormulaLong = moleculeData[dataIndex].chemicalFormulaLong;
                     var chemicalFormulaForSpeech = Helpers.chemicalFormulaToReadable(chemicalFormulaLong);
                     speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormulaForSpeech);
+                }
+
+                /**
+                 * Handle speech is undefined
+                 * **/
+                if (!speechOutput) {
+                    speechOutput += _this.t("NOTHING_FOUND");
+                }
+
+            } else {
+                speechOutput += _this.t("MOLECULE_ERROR_MESSAGE", moleculeName);
+            }
+
+            if (speechOutput) {
+                _this.emit(":tell", speechOutput);
+            } else {
+                _this.emit(":tell", _this.t("WELCOME_MESSAGE"));
+            }
+
+        });
+    },
+
+    /**
+     * Method to process Solubility Intent
+     */
+
+    "GetSoluble": function (slots) {
+        var moleculeName = slots.MoleculeName.value;
+        var secondMoleculeName = slots.SecondMoleculeName.value;
+        var moleculeData = [];
+        var _this = this;
+
+        Data.httpGet(moleculeName, function (result) {
+
+            moleculeData = result.data;
+
+            var dataIndex = _.findIndex(moleculeData, function (mol) {
+                return mol.IUPACName.toLowerCase() == moleculeName.toLowerCase();
+            });
+
+            /**
+             * Handle molecule request
+             * **/
+            if (dataIndex != -1) {
+
+                /**
+                 * Handle Solubility request
+                 * **/
+                if (slots.Properties && slots.Properties.value) {
+                    var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
+                        return prop.valueTitle.toLowerCase() == "solubility";
+                    });
+
+                    if (propertiesIndex == -1) {
+                        speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", "solubility", moleculeName);
+                    } else {
+                        var property = moleculeData[dataIndex].properties[propertiesIndex];
+                        var solubilityList = property.valueData.split(', ');
+
+                        var solubleIndex = _.indexOf(solubilityList, secondMoleculeName);
+
+                        if (solubleIndex == -1) {
+
+                            if (_.includes(property.valueData, secondMoleculeName)) {
+                                speechOutput += _this.t("SOLUBLE_MESSAGE", moleculeName, secondMoleculeName);
+                            } else {
+                                speechOutput += _this.t("SOLUBILITY_NOT_FOUND", moleculeName, secondMoleculeName, property.valueData.toString());
+                            }
+
+                        } else {
+                            speechOutput += _this.t("SOLUBLE_MESSAGE", moleculeName, secondMoleculeName);
+                        }
+                    }
+
                 }
 
                 /**
