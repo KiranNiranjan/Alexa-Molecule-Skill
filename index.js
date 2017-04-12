@@ -41,6 +41,18 @@ var languageString = {
             "GOOD_BYE": "Goodbye! Have a nice day"
         }
     },
+    "en-US": {
+        "translation": {
+            "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
+            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or What is the chemical formula of carbon dioxide",
+            "PROPERTIES": "%s of %s is %s",
+            "CHEMICAL_FORMULA": "%s for %s is %s",
+            "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
+            "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
+            "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
+            "GOOD_BYE": "Goodbye! Have a nice day"
+        }
+    },
     "en-GB": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
