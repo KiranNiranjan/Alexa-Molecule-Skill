@@ -169,6 +169,10 @@ var newSessionHandlers = {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
+    "SolubilityIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
+        this.emitWithState("GetSoluble", this.event.request.intent.slots);
+    },
     "QuizMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
         this.emitWithState("StartQuiz");
@@ -200,13 +204,13 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
-    "QuizMoleculeIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
-        this.emitWithState("StartQuiz");
-    },
     "SolubilityIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetSoluble", this.event.request.intent.slots);
+    },
+    "QuizMoleculeIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
+        this.emitWithState("StartQuiz");
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
