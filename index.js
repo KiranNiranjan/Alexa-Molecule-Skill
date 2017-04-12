@@ -49,7 +49,8 @@ var languageString = {
             "CHEMICAL_FORMULA": "%s for %s is %s",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
-            "NOTHING_FOUND": "Sorry! I din't catch that. Please try again"
+            "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
+            "GOOD_BYE": "Goodbye! Have a nice day"
         }
     },
     "de": {
@@ -60,7 +61,8 @@ var languageString = {
             "CHEMICAL_FORMULA": "%s voor %s is %s",
             "MOLECULE_ERROR_MESSAGE": "Ik heb geen informatie over hebben %s.",
             "PROPERTIES_ERROR_MESSAGE": "Ik heb geen informatie over hebben %s van %s.",
-            "NOTHING_FOUND": "Sorry! Ik heb niet verstaan. Probeer het opnieuw"
+            "NOTHING_FOUND": "Sorry! Ik heb niet verstaan. Probeer het opnieuw",
+            "GOOD_BYE": "Vaarwel! Fijne dag"
         }
     }
 
