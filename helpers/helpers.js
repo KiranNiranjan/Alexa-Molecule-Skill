@@ -17,6 +17,7 @@
 
 var _ = require('lodash');
 
+// Method to convert chemical formula to alexa readable format
 exports.chemicalFormulaToReadable = function (string) {
     var result = '';
 
@@ -37,3 +38,12 @@ exports.chemicalFormulaToReadable = function (string) {
 
     return "<say-as interpret-as='spell-out'>" + result + "</say-as>";
 };
+
+// Method to convert units to alexa readable format
+exports.unitsToReadable = function (string) {
+
+    string = string.replace(/−/g, '');
+    return "<say-as interpret-as='unit'>" + string + "</say-as>";
+
+};
+
