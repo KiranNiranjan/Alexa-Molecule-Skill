@@ -26,6 +26,8 @@ var MOLECULE_ALEXA_STATE = {
     HELP: "HELPMODE"
 };
 
+var speechOutput = "";
+
 var languageString = {
     "en": {
         "translation": {
@@ -35,7 +37,8 @@ var languageString = {
             "CHEMICAL_FORMULA": "%s for %s is %s",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
-            "NOTHING_FOUND": "Sorry! I din't catch that. Please try again"
+            "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
+            "GOOD_BYE": "Goodbye! Have a nice day"
         }
     }
 };
@@ -63,6 +66,12 @@ var newSessionHandlers = {
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
+    'AMAZON.StopIntent': function () {
+        this.emit(':tell', this.t("GOOD_BYE"));
+    },
+    'AMAZON.RepeatIntent': function () {
+        this.emit(':ask', this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+    },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");
         this.emit(":ask", speechOutput, speechOutput);
@@ -71,7 +80,7 @@ var newSessionHandlers = {
 
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
     "StartMolecules": function () {
-        this.emit(":ask", this.t("WELCOME_MESSAGE") + this.t("HELP_MESSAGE"));
+        this.emit(":ask", this.t("WELCOME_MESSAGE") + ' ' + this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "GetMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
@@ -79,6 +88,12 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+    },
+    'AMAZON.StopIntent': function () {
+        this.emit(':tell', this.t("GOOD_BYE"));
+    },
+    'AMAZON.RepeatIntent': function () {
+        this.emit(':ask', this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");
@@ -92,8 +107,6 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         var moleculeName = slots.MoleculeName.value;
         var moleculeData = [];
         var _this = this;
-        var speechOutput = "";
-
 
         Data.httpGet(moleculeName, function (result) {
 
@@ -120,7 +133,7 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
                         speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
                     } else {
                         var properties = moleculeData[dataIndex].properties[propertiesIndex];
-                        if (properties.valueTitle == "Density" || properties.valueTitle == "Molar mass") properties.valueData = properties.valueData.replace(/−/g, ' ');
+                        if (properties.valueTitle == "Density" || properties.valueTitle == "Molar mass") properties.valueData = exports.unitsToReadable(properties.valueData);
                         speechOutput += _this.t("PROPERTIES", properties.valueTitle, moleculeName, properties.valueData);
                     }
 
@@ -156,6 +169,13 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+    },
+    'AMAZON.StopIntent': function () {
+        this.emit(':tell', this.t("GOOD_BYE"));
+    },
+    'AMAZON.RepeatIntent': function () {
+        if (!speechOutput) speechOutput = this.t("HELP_MESSAGE");
+        this.emit(':ask', speechOutput, this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");
