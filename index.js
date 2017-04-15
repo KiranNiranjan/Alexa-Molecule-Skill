@@ -545,14 +545,14 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
 
         });
     },
-    "GetChemicalName": function () {
+    "GetChemicalName": function (slots) {
 
         var speechOutput = "";
         var chemicalFormula = slots.ChemicalName.value;
         var moleculeData = [];
         var _this = this;
 
-        Data.httpGet(moleculeName, function (result) {
+        Data.httpGet(chemicalFormula, function (result) {
 
             moleculeData = result.data;
 
