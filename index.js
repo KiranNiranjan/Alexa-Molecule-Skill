@@ -134,7 +134,7 @@ var languageString = {
 exports.handler = function (event, context) {
     var alexa = Alexa.handler(event, context);
     alexa.resources = languageString;
-    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers, exampleMoleculeHandlers, moleculeQuizHandlers);
+    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers, exampleMoleculeHandlers);
     alexa.execute();
 };
 
@@ -162,14 +162,6 @@ var newSessionHandlers = {
     "ExampleMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.EXAMPLE;
         this.emitWithState("GetExamples");
-    },
-    "MoleculeQuizIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
-        this.emitWithState("MoleculeQuiz");
-    },
-    "AnswerMoleculeIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
-        this.emitWithState("Answer", this.event.request.intent.slots);
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
@@ -205,14 +197,6 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
     "ExampleMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.EXAMPLE;
         this.emitWithState("GetExamples");
-    },
-    "MoleculeQuizIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
-        this.emitWithState("MoleculeQuiz");
-    },
-    "AnswerMoleculeIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
-        this.emitWithState("Answer", this.event.request.intent.slots);
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
