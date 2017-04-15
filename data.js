@@ -36,3 +36,25 @@ exports.httpGet = function (molecule, callback) {
     });
 
 };
+
+/** Method to get the data from our main database **/
+exports.getDataForQuiz = function (prop, callback) {
+
+    var req = {
+        url: 'http://molecule.kike.co.in:3000/molecules/quiz/' + prop,
+        method: 'GET'
+    };
+
+    request(req, function optionalCallback(err, httpResponse, body) {
+
+        if (err) {
+            console.log(err);
+        }
+
+        if (body) {
+            callback(JSON.parse(body));
+        }
+
+    });
+
+};
