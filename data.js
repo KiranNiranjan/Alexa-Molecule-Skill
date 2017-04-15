@@ -15,6 +15,7 @@
  **/
 const request = require('request');
 
+/** Method to get the data from our main database **/
 exports.httpGet = function (molecule, callback) {
 
     var req = {

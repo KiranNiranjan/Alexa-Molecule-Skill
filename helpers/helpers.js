@@ -17,7 +17,7 @@
 
 var _ = require('lodash');
 
-// Method to convert chemical formula to alexa readable format
+/** Method to convert chemical formula to alexa readable format **/
 exports.chemicalFormulaToReadable = function (string) {
     var result = '';
 
@@ -39,7 +39,7 @@ exports.chemicalFormulaToReadable = function (string) {
     return "<say-as interpret-as='spell-out'>" + result + "</say-as>";
 };
 
-// Method to convert units to alexa readable format
+/** Method to convert units to alexa readable format **/
 exports.unitsToReadable = function (string) {
 
     string = string.replace(/−/g, '');
@@ -47,7 +47,7 @@ exports.unitsToReadable = function (string) {
 
 };
 
-// Method to provide a random example
+/** Method to provide a random example **/
 exports.examples = function () {
 
     var examples = [
@@ -74,7 +74,7 @@ exports.examples = function () {
 
 };
 
-// Method to convert custom properties to required
+/** Method to convert custom properties to required **/
 exports.propertiesConverter = function (prop) {
 
     switch (prop.toLowerCase()) {
@@ -96,12 +96,12 @@ exports.propertiesConverter = function (prop) {
 
 };
 
-// Method to replace and to the last index of ","
+/** Method to replace and to the last index of "," **/
 exports.replaceLastIndexWithComma = function (prop) {
     return prop.replaceAt(prop.lastIndexOf(","), " and")
 };
 
-// Method to replace a char using index
+/** Method to replace a char using index **/
 String.prototype.replaceAt = function (index, char) {
     var a = this.split("");
     a[index] = char;
