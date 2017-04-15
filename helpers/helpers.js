@@ -63,13 +63,53 @@ exports.examples = function () {
         "Chemical Formula of Fluorine?",
         "What is the chemical formula of Benzene?",
         "What is the autoignition temperature of Carbon Monoxide?",
-        "How does Ammonia smells like?", // TODO add smells like intent
+        "How does Ammonia smells like?",
         "Does Ammonia soluble in water?",
-        "How does Fluoroform looks like or  appears like?", // TODO add looks like intent
+        "How does Fluoroform looks like or  appears like?",
         "What are the Hazards of Difluoromethane?",
         "Melting point for Sodium fluoride?",
         "What is the Flash point of Sodium nitrate?",
-        "What is the density of Sodium?"
-    ]
+        "What is the density of Sodium?",
+        "What is the odor of Nonane?",
+        "What is the Critical point of Ammonia?",
+        "Can you describe Nitrate?"
+    ];
+
+    return examples[_.random(0, 14)];
 
 };
+
+// Method to convert custom properties to required
+exports.propertiesConverter = function (prop) {
+
+    switch (prop.toLowerCase()) {
+        case "smells like":
+            prop = "Odor";
+            break;
+        case "smells":
+            prop = "Odor";
+            break;
+        case "looks like":
+            prop = "Appearance";
+            break;
+        case "appears like":
+            prop = "Appearance";
+            break;
+    }
+
+    return prop
+
+};
+
+// Method to replace and to the last index of ","
+exports.replaceLastIndexWithComma = function (prop) {
+    return prop.replaceAt(prop.lastIndexOf(","), " and")
+};
+
+// Method to replace a char using index
+String.prototype.replaceAt = function (index, char) {
+    var a = this.split("");
+    a[index] = char;
+    return a.join("");
+};
+
