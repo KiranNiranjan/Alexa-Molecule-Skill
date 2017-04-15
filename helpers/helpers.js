@@ -47,11 +47,6 @@ exports.unitsToReadable = function (string) {
 
 };
 
-exports.generateQuestion = function (counter, property, question) {
-
-    return "Here is your " + counter + "th question.  What is the " + property + " of " + question + "?";
-};
-
 // Method to provide a random example
 exports.examples = function () {
 

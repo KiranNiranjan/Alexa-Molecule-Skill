@@ -24,12 +24,10 @@ var MOLECULE_ALEXA_STATE = {
     START: "START_MODE",
     QUESTION: "QUESTION_MODE",
     EXAMPLE: "EXAMPLE_MODE",
-    QUIZ: "QUIZ_MODE",
     HELP: "HELP_MODE"
 };
 
 var repeatSpeechOut = "";
-var question = "";
 
 var languageString = {
     "en": {
@@ -97,68 +95,10 @@ var languageString = {
     }
 };
 
-var molecules = [
-    "Nitrogen",
-    "CarbonMonoxide",
-    "Carbon dioxide",
-    "Cyanide",
-    "Hydrogen Cyanide",
-    "Cyanogen",
-    "Nitrous oxide",
-    "Nitrate",
-    "Nitrogen monohydride",
-    "Ammonia",
-    "Formic acid",
-    "Cyanamide",
-    "Isocyanic acid",
-    "Hydrazine ",
-    "Hydrazoic acid",
-    "Nitric acid",
-    "Nitrous acid",
-    "Ozone",
-    "Oxygen",
-    "Carbonic acid ",
-    "Peroxynitric acid",
-    "Fluorine",
-    "Hydrogen fluoride",
-    "Hypofluorous acid",
-    "Ammonium bifluoride",
-    "Carbonyl fluoride",
-    "Tetrafluoromethane",
-    "Fluoroform",
-    "Difluoromethane",
-    "tetrafluoroethylene",
-    "Fluorine azide",
-    "Fluorine nitrate",
-    "Nitrogen trifluoride",
-    "Nitrosyl fluoride",
-    "Nitryl fluoride",
-    "Dinitrogen difluoride",
-    "Tetrafluorohydrazine",
-    "Ammonium fluoride",
-    "Oxygen difluoride"
-];
-
-var properties = [
-    "Molar mass",
-    "Boiling point",
-    "Melting point",
-    "Autoignition temperature",
-    "Odor",
-    "Solubility",
-    "Density",
-    "Phase",
-    "Triple point",
-    "Critical point",
-    "Atomic number",
-    "Atomic mass",
-    "Smell"
-];
-
 exports.handler = function (event, context) {
     var alexa = Alexa.handler(event, context);
     alexa.resources = languageString;
-    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers, quizMoleculeHandlers, exampleMoleculeHandlers);
+    alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers, exampleMoleculeHandlers);
     alexa.execute();
 };
 
@@ -182,10 +122,6 @@ var newSessionHandlers = {
     "ExampleMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.EXAMPLE;
         this.emitWithState("GetExamples");
-    },
-    "QuizMoleculeIntent": function () {
-        this.handler.state = MOLECULE_ALEXA_STATE.QUIZ;
-        this.emitWithState("StartQuiz");
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
@@ -235,58 +171,6 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         var speechOutput = this.t("NOTHING_FOUND");
         this.emit(":ask", speechOutput, speechOutput);
     }
-});
-
-var quizMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUIZ, {
-
-    "StartQuiz": function () {
-        this.attributes["response"] = "";
-        this.attributes["quizCounter"] = 0;
-        this.attributes["quizScore"] = 0;
-        this.emitWithState("AskQuestion");
-        question = ""
-    },
-
-    "AskQuestion": function () {
-        var _this = this;
-
-        if (this.attributes["quizCounter"] == 0) {
-            this.attributes["response"] = _this.t("START_QUIZ_MESSAGE")
-        }
-
-        var moleculesIndex = _.random(0, molecules.length - 1);
-        var propertyIndex = _.random(0, properties.length - 1);
-
-        var molecule = molecules[moleculesIndex];
-        var property = properties[propertyIndex];
-
-        this.attributes["quizQuestion"] = molecule;
-        this.attributes["property"] = property;
-        this.attributes["quizCounter"]++;
-
-        question += Helpers.generateQuestion(this.attributes["quizCounter"], property, molecule);
-
-        this.emit(":ask", question, question);
-    },
-
-    "AnswerIntent": function () {
-        this.emit(":tell", question);
-    },
-    "AMAZON.HelpIntent": function () {
-        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
-    },
-    'AMAZON.StopIntent': function () {
-        this.emit(':tell', this.t("GOOD_BYE"));
-    },
-    'AMAZON.RepeatIntent': function () {
-        if (!question) question = this.t("HELP_MESSAGE");
-        this.emit(':ask', question, this.t("HELP_MESSAGE"));
-    },
-    "Unhandled": function () {
-        this.emitWithState("AnswerIntent");
-    }
-
-
 });
 
 var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUESTION, {
