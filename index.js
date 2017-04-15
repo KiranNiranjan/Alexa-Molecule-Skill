@@ -411,7 +411,7 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         var moleculeData = [];
         var _this = this;
 
-        Data.httpGet(moleculeName, function (result) {
+        Data.httpGet(chemicalFormula, function (result) {
 
             moleculeData = result.data;
 
