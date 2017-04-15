@@ -39,6 +39,7 @@ var languageString = {
             "CHEMICAL_FORMULA": "%s for %s is %s",
 
             "DESCRIPTION": "%s",
+            "CHEMICAL_NAME": "Chemical name for %s is %s",
 
             "SOLUBILITY_NOT_FOUND": "I don't think %s soluble in %s. But %s is soluble in %s",
             "SOLUBILITY_SINGLE_NOT_FOUND": "I don't think %s soluble in %s. But %s %s",
@@ -234,6 +235,14 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
                 if (slots.Description && slots.Description.value) {
                     var description = moleculeData[dataIndex].description;
                     speechOutput += _this.t("DESCRIPTION", description);
+                }
+
+                /**
+                 * Handle chemical name request
+                 * **/
+                if (slots.ChemicalName && slots.ChemicalName.value) {
+                    var chemicalName = moleculeData[dataIndex].IUPACName;
+                    speechOutput += _this.t("CHEMICAL_NAME", Helpers.chemicalFormulaToReadable(slots.ChemicalName.value), chemicalName);
                 }
 
                 /**
