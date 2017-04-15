@@ -128,13 +128,16 @@ var languageString = {
     }
 };
 
+/** Alexa Handler **/
 exports.handler = function (event, context) {
     var alexa = Alexa.handler(event, context);
     alexa.resources = languageString;
     alexa.registerHandlers(newSessionHandlers, startMoleculeHandlers, questionMoleculeHandlers, exampleMoleculeHandlers);
     alexa.execute();
 };
+/** End Alexa Handler **/
 
+/** New Session Handler **/
 var newSessionHandlers = {
     "LaunchRequest": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
@@ -171,6 +174,9 @@ var newSessionHandlers = {
     }
 };
 
+/** End New Session Handler **/
+
+/** Start Handler **/
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
     "StartMolecules": function () {
         this.emit(":ask", this.t("WELCOME_MESSAGE") + ' ' + this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
@@ -205,7 +211,9 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         this.emit(":ask", speechOutput, speechOutput);
     }
 });
+/** End Start Handler **/
 
+/** Main Question Handler **/
 var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUESTION, {
 
     /**
@@ -374,6 +382,9 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
                     speechOutput += _this.t("NOTHING_FOUND");
                 }
 
+                /**
+                 * Handle molecule is undefined
+                 * **/
             } else {
                 speechOutput += _this.t("MOLECULE_ERROR_MESSAGE", moleculeName);
             }
@@ -381,7 +392,11 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
             if (speechOutput) {
                 repeatSpeechOut = speechOutput;
                 _this.emit(":tell", speechOutput);
+
             } else {
+                /**
+                 * Welcome message
+                 * **/
                 repeatSpeechOut = _this.t("WELCOME_MESSAGE");
                 _this.emit(":tell", _this.t("WELCOME_MESSAGE"));
             }
@@ -403,7 +418,9 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         this.emit(":ask", speechOutput, speechOutput);
     }
 });
+/** End Main Question Handler **/
 
+/** Example Handler **/
 var exampleMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.EXAMPLE, {
 
     "GetExamples": function () {
@@ -426,4 +443,5 @@ var exampleMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.EXAM
         this.emit(":ask", speechOutput, speechOutput);
     }
 });
+/** End Example Handler **/
 
