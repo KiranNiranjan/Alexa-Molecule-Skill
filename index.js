@@ -58,10 +58,21 @@ var languageString = {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
             "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or  What is the chemical formula of carbon dioxide",
+
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
+
+            "DESCRIPTION": "%s",
+
+            "SOLUBILITY_NOT_FOUND": "I don't think %s soluble in %s. But %s is soluble in %s",
+            "SOLUBILITY_SINGLE_NOT_FOUND": "I don't think %s soluble in %s. But %s %s",
+            "SOLUBLE_MESSAGE": "Yes, %s is soluble in %s",
+            "SOLUBLE_SINGLE_MESSAGE": "Yes, %s %s",
+
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
+
+            "EXAMPLE": "Here is an example,  %s",
             "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
             "GOOD_BYE": "Goodbye! Have a nice day",
             "START_QUIZ_MESSAGE": "OK. I will ask you 10 questions about Molecules."
@@ -71,10 +82,21 @@ var languageString = {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
             "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or  What is the chemical formula of carbon dioxide",
+
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
+
+            "DESCRIPTION": "%s",
+
+            "SOLUBILITY_NOT_FOUND": "I don't think %s soluble in %s. But %s is soluble in %s",
+            "SOLUBILITY_SINGLE_NOT_FOUND": "I don't think %s soluble in %s. But %s %s",
+            "SOLUBLE_MESSAGE": "Yes, %s is soluble in %s",
+            "SOLUBLE_SINGLE_MESSAGE": "Yes, %s %s",
+
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
+
+            "EXAMPLE": "Here is an example,  %s",
             "NOTHING_FOUND": "Sorry! I din't catch that. Please try again",
             "GOOD_BYE": "Goodbye! Have a nice day",
             "START_QUIZ_MESSAGE": "OK. I will ask you 10 questions about Molecules."
@@ -83,12 +105,23 @@ var languageString = {
     "de-DE": {
         "translation": {
             "WELCOME_MESSAGE": "Willkommen bei Molecule! Du kannst mich nach irgendwelchen Molekülen fragen",
-            "HELP_MESSAGE": "Versuchen Sie, etwas zu sagen, Siedepunkt von Methane oder Was ist die chemische Formel von carbon dioxide",
+            "HELP_MESSAGE": "Versuchen Sie, etwas zu sagen, Siedepunkt von Methan oder Was ist die chemische Formel von Kohlendioxid",
+
             "PROPERTIES": "%s von %s Ist %s",
-            "CHEMICAL_FORMULA": "%s zum %s Ist %s",
+            "CHEMICAL_FORMULA": "%s für %s ist %s",
+
+            "DESCRIPTION": "%s",
+
+            "SOLUBILITY_NOT_FOUND": "Ich glaube nicht, dass %s in %s löslich ist. Aber %s ist in %s löslich",
+            "SOLUBILITY_SINGLE_NOT_FOUND": "Ich glaube nicht, dass %s in %s löslich ist. Aber %s %s",
+            "SOLUBLE_MESSAGE": "Ja, %s ist in %s löslich",
+            "SOLUBLE_SINGLE_MESSAGE": "Ja, %s %s",
+
             "MOLECULE_ERROR_MESSAGE": "Ich habe keine Informationen für %s.",
             "PROPERTIES_ERROR_MESSAGE": "Ich habe keine Informationen über %s von %s.",
-            "NOTHING_FOUND": "Es tut uns leid! Ich habe das nicht gefangen. Bitte versuche es erneut",
+
+            "EXAMPLE": "Hier ist ein Beispiel, %s",
+            "NOTHING_FOUND": "Es tut uns leid! Ich fange das nicht an. Bitte versuche es erneut",
             "GOOD_BYE": "Auf Wiedersehen! Einen schönen Tag noch",
             "START_QUIZ_MESSAGE": "OK. Ich werde euch 10 Fragen über Molecules stellen."
         }
