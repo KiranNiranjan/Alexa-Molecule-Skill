@@ -4,6 +4,17 @@ This is a Alexa skill which help Alexa answer simple Molecule details like Bolli
 
 ![Alexa Cover](https://raw.githubusercontent.com/KiranNiranjan/Alexa-Molecule-Skill/master/images/alexa-cover.jpg)
 
+
+## Examples
+ 
+* Alexa, What is the Atomic Number for Nitrogen molecule
+* Alexa, Odor for Hydrogen cyanide
+* Alexa, Get the Density for Hydrazine molecule
+* Alexa, Get me the Phase for Carbonyl fluoride molecule
+* Alexa, Chemical Formula of sulfuric acid
+* Alexa, Carbonyl fluoride Chemical Formula
+* Alexa, Does Tetrafluoromethane soluble in Benzene
+
 ## Authors
 [KiKe](http://kike.co.in)
 
