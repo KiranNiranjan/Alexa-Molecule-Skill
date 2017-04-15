@@ -16,6 +16,7 @@
 'use strict';
 
 var _ = require('lodash');
+var Data = require('../data');
 
 // Method to convert chemical formula to alexa readable format
 exports.chemicalFormulaToReadable = function (string) {
@@ -47,6 +48,11 @@ exports.unitsToReadable = function (string) {
 
 };
 
+exports.generateQuestion = function (counter, property, question) {
+
+    return "Here is your " + counter + "th question.  What is the " + property + " of " + question + "?. " + "Options Are A. %s B. %s C. %s D. %s";
+};
+
 // Method to provide a random example
 exports.examples = function () {
 
@@ -58,53 +64,48 @@ exports.examples = function () {
         "Chemical Formula of Fluorine?",
         "What is the chemical formula of Benzene?",
         "What is the autoignition temperature of Carbon Monoxide?",
-        "How does Ammonia smells like?",
+        "How does Ammonia smells like?", // TODO add smells like intent
         "Does Ammonia soluble in water?",
-        "How does Fluoroform looks like or  appears like?",
+        "How does Fluoroform looks like or  appears like?", // TODO add looks like intent
         "What are the Hazards of Difluoromethane?",
         "Melting point for Sodium fluoride?",
         "What is the Flash point of Sodium nitrate?",
-        "What is the density of Sodium?",
-        "What is the odor of Nonane?",
-        "What is the Critical point of Ammonia?",
-        "Can you describe Nitrate?"
-    ];
-
-    return examples[_.random(0, 14)];
+        "What is the density of Sodium?"
+    ]
 
 };
 
-// Method to convert custom properties to required
-exports.propertiesConverter = function (prop) {
 
-    switch (prop.toLowerCase()) {
-        case "smells like":
-            prop = "Odor";
-            break;
-        case "smells":
-            prop = "Odor";
-            break;
-        case "looks like":
-            prop = "Appearance";
-            break;
-        case "appears like":
-            prop = "Appearance";
-            break;
-    }
+exports.checkAnswer = function (slot, moleculeName) {
+    var moleculeData;
+    var value = {};
 
-    return prop
+    Data.httpGet(moleculeName, function (result) {
 
+        moleculeData = result.data;
+
+        var dataIndex = _.findIndex(moleculeData, function (mol) {
+            return mol.IUPACName.toLowerCase() == moleculeName.toLowerCase();
+        });
+
+
+        if (dataIndex != -1) {
+
+            var chemicalFormula = moleculeData[dataIndex].chemicalFormula.toLowerCase;
+            if (chemicalFormula == slot.Answer.value.toLowerCase()) {
+                value = {
+                    key: chemicalFormula,
+                    answer: true
+                };
+                return value
+            } else {
+                value = {
+                    key: chemicalFormula,
+                    answer: false
+                };
+                return value
+            }
+        }
+
+    });
 };
-
-// Method to replace and to the last index of ","
-exports.replaceLastIndexWithComma = function (prop) {
-    return prop.replaceAt(prop.lastIndexOf(","), " and")
-};
-
-// Method to replace a char using index
-String.prototype.replaceAt = function (index, char) {
-    var a = this.split("");
-    a[index] = char;
-    return a.join("");
-};
-
