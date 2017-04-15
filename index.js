@@ -39,6 +39,7 @@ var languageString = {
             "CHEMICAL_FORMULA": "%s for %s is %s",
 
             "DESCRIPTION": "%s",
+            "CHEMICAL_NAME": "Chemical name for %s is %s",
 
             "SOLUBILITY_NOT_FOUND": "I don't think %s soluble in %s. But %s is soluble in %s",
             "SOLUBILITY_SINGLE_NOT_FOUND": "I don't think %s soluble in %s. But %s %s",
@@ -151,6 +152,10 @@ var newSessionHandlers = {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
     },
+    "ChemicalNameIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
+        this.emitWithState("GetChemicalName", this.event.request.intent.slots);
+    },
     "SolubilityMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetSoluble", this.event.request.intent.slots);
@@ -184,6 +189,10 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
     "GetMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
         this.emitWithState("GetMolecules", this.event.request.intent.slots);
+    },
+    "ChemicalNameIntent": function () {
+        this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
+        this.emitWithState("GetChemicalName", this.event.request.intent.slots);
     },
     "SolubilityMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
@@ -402,6 +411,55 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
             }
 
         });
+    },
+    "GetChemicalName": function () {
+
+        var speechOutput = "";
+        var chemicalFormula = slots.ChemicalName.value;
+        var moleculeData = [];
+        var _this = this;
+
+        Data.httpGet(moleculeName, function (result) {
+
+            moleculeData = result.data;
+
+            var dataIndex = _.findIndex(moleculeData, function (mol) {
+                return mol.chemicalFormula.toLowerCase() == chemicalFormula.toLowerCase();
+            });
+
+            /**
+             * Handle molecule request
+             * **/
+            if (dataIndex != -1) {
+
+                /**
+                 * Handle chemical name request
+                 * **/
+                if (slots.ChemicalName && slots.ChemicalName.value) {
+                    var chemicalName = moleculeData[dataIndex].IUPACName;
+                    speechOutput += _this.t("CHEMICAL_NAME", Helpers.chemicalFormulaToReadable(slots.ChemicalName.value), chemicalName);
+                }
+
+                /**
+                 * Handle molecule is undefined
+                 * **/
+            } else {
+                speechOutput += _this.t("MOLECULE_ERROR_MESSAGE", chemicalFormula);
+            }
+
+            if (speechOutput) {
+                repeatSpeechOut = speechOutput;
+                _this.emit(":tell", speechOutput);
+            } else {
+                /**
+                 * Welcome message
+                 * **/
+                repeatSpeechOut = _this.t("WELCOME_MESSAGE");
+                _this.emit(":tell", _this.t("WELCOME_MESSAGE"));
+            }
+
+        });
+
     },
     "AMAZON.HelpIntent": function () {
         this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
