@@ -34,7 +34,7 @@ var languageString = {
     "en": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
-            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or  What is the chemical formula of carbon dioxide",
+            "HELP_MESSAGE": "Try saying some thing like, %s",
 
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
@@ -60,7 +60,7 @@ var languageString = {
     "en-US": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
-            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or  What is the chemical formula of carbon dioxide",
+            "HELP_MESSAGE": "Try saying some thing like, %s",
 
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
@@ -84,7 +84,7 @@ var languageString = {
     "en-GB": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
-            "HELP_MESSAGE": "Try saying some thing like, Boiling point of methane or  What is the chemical formula of carbon dioxide",
+            "HELP_MESSAGE": "Try saying some thing like, %s",
 
             "PROPERTIES": "%s of %s is %s",
             "CHEMICAL_FORMULA": "%s for %s is %s",
@@ -108,7 +108,7 @@ var languageString = {
     "de-DE": {
         "translation": {
             "WELCOME_MESSAGE": "Willkommen bei Molecule! Du kannst mich nach irgendwelchen Molekülen fragen",
-            "HELP_MESSAGE": "Versuchen Sie, etwas zu sagen, Siedepunkt von Methan oder Was ist die chemische Formel von Kohlendioxid",
+            "HELP_MESSAGE": "Versuchen Sie, etwas zu sagen, %s",
 
             "PROPERTIES": "%s von %s Ist %s",
             "CHEMICAL_FORMULA": "%s für %s ist %s",
@@ -164,13 +164,11 @@ var newSessionHandlers = {
         this.emitWithState("GetExamples");
     },
     "AMAZON.HelpIntent": function () {
-        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+        var question = Helpers.examples();
+        this.emit(":ask", this.t("HELP_MESSAGE", question), this.t("HELP_MESSAGE", question));
     },
     'AMAZON.StopIntent': function () {
         this.emit(':tell', this.t("GOOD_BYE"));
-    },
-    'AMAZON.RepeatIntent': function () {
-        this.emit(':ask', this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");
@@ -199,13 +197,11 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         this.emitWithState("GetExamples");
     },
     "AMAZON.HelpIntent": function () {
-        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+        var question = Helpers.examples();
+        this.emit(":ask", this.t("HELP_MESSAGE", question), this.t("HELP_MESSAGE", question));
     },
     'AMAZON.StopIntent': function () {
         this.emit(':tell', this.t("GOOD_BYE"));
-    },
-    'AMAZON.RepeatIntent': function () {
-        this.emit(':ask', this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");
@@ -289,10 +285,10 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
 
             if (speechOutput) {
                 repeatSpeechOut = speechOutput;
-                _this.emit(":tell", speechOutput);
+                _this.emit(":ask", speechOutput);
             } else {
                 repeatSpeechOut = _this.t("WELCOME_MESSAGE");
-                _this.emit(":tell", _this.t("WELCOME_MESSAGE"));
+                _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
             }
 
         });
@@ -390,14 +386,14 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
 
             if (speechOutput) {
                 repeatSpeechOut = speechOutput;
-                _this.emit(":tell", speechOutput);
+                _this.emit(":ask", speechOutput);
 
             } else {
                 /**
                  * Welcome message
                  * **/
                 repeatSpeechOut = _this.t("WELCOME_MESSAGE");
-                _this.emit(":tell", _this.t("WELCOME_MESSAGE"));
+                _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
             }
 
         });
@@ -439,27 +435,24 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
 
             if (speechOutput) {
                 repeatSpeechOut = speechOutput;
-                _this.emit(":tell", speechOutput);
+                _this.emit(":ask", speechOutput);
             } else {
                 /**
                  * Welcome message
                  * **/
                 repeatSpeechOut = _this.t("WELCOME_MESSAGE");
-                _this.emit(":tell", _this.t("WELCOME_MESSAGE"));
+                _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
             }
 
         });
 
     },
     "AMAZON.HelpIntent": function () {
-        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+        var question = Helpers.examples();
+        this.emit(":ask", this.t("HELP_MESSAGE", question), this.t("HELP_MESSAGE", question));
     },
     'AMAZON.StopIntent': function () {
         this.emit(':tell', this.t("GOOD_BYE"));
-    },
-    'AMAZON.RepeatIntent': function () {
-        if (!repeatSpeechOut) repeatSpeechOut = this.t("HELP_MESSAGE");
-        this.emit(':ask', repeatSpeechOut, this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");
@@ -475,14 +468,11 @@ var exampleMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.EXAM
         this.emit(":tell", this.t("EXAMPLE", example), this.t("EXAMPLE", example));
     },
     "AMAZON.HelpIntent": function () {
-        this.emit(":ask", this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+        var question = Helpers.examples();
+        this.emit(":ask", this.t("HELP_MESSAGE", question), this.t("HELP_MESSAGE", question));
     },
     'AMAZON.StopIntent': function () {
         this.emit(':tell', this.t("GOOD_BYE"));
-    },
-    'AMAZON.RepeatIntent': function () {
-        repeatSpeechOut = this.attributes["example"] ? this.attributes["example"] : this.t("HELP_MESSAGE");
-        this.emit(':ask', repeatSpeechOut, this.t("HELP_MESSAGE"));
     },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");

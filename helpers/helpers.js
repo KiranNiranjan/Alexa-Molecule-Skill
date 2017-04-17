@@ -70,7 +70,7 @@ exports.examples = function () {
         "Can you describe Nitrate?"
     ];
 
-    return examples[_.random(0, 14)];
+    return examples[_.random(0, examples.length - 1)];
 
 };
 
