@@ -465,7 +465,7 @@ var exampleMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.EXAM
     "GetExamples": function () {
         var example = Helpers.examples();
         this.attributes["example"] = example;
-        this.emit(":tell", this.t("EXAMPLE", example), this.t("EXAMPLE", example));
+        this.emit(":ask", this.t("EXAMPLE", example), this.t("EXAMPLE", example));
     },
     "AMAZON.HelpIntent": function () {
         var question = Helpers.examples();
