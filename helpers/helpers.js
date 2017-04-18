@@ -51,8 +51,8 @@ exports.unitsToReadable = function (string) {
 exports.examples = function () {
 
     var examples = [
-        "What is the atomic number for Carbon?",
-        "What is the boiling point for Water?",
+        "What is the atomic number of Carbon?",
+        "What is the boiling point of Water?",
         "Odor for Hydrogen cyanide?",
         "How does Formic acid looks like?",
         "Chemical Formula of Fluorine?",

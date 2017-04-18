@@ -47,6 +47,7 @@ var languageString = {
             "SOLUBLE_MESSAGE": "Yes, %s is soluble in %s",
             "SOLUBLE_SINGLE_MESSAGE": "Yes, %s %s",
 
+            "MOLECULE_UNDEFINED": "Sorry! I din't catch that. Please try again",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
 
@@ -72,6 +73,7 @@ var languageString = {
             "SOLUBLE_MESSAGE": "Yes, %s is soluble in %s",
             "SOLUBLE_SINGLE_MESSAGE": "Yes, %s %s",
 
+            "MOLECULE_UNDEFINED": "Sorry! I din't catch that. Please try again",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
 
@@ -96,6 +98,7 @@ var languageString = {
             "SOLUBLE_MESSAGE": "Yes, %s is soluble in %s",
             "SOLUBLE_SINGLE_MESSAGE": "Yes, %s %s",
 
+            "MOLECULE_UNDEFINED": "Sorry! I din't catch that. Please try again",
             "MOLECULE_ERROR_MESSAGE": "I don't have any information for %s.",
             "PROPERTIES_ERROR_MESSAGE": "I don't have any information on %s of %s.",
 
@@ -120,6 +123,7 @@ var languageString = {
             "SOLUBLE_MESSAGE": "Ja, %s ist in %s löslich",
             "SOLUBLE_SINGLE_MESSAGE": "Ja, %s %s",
 
+            "MOLECULE_UNDEFINED": "Es tut uns leid! Ich fange das nicht an. Bitte versuche es erneut",
             "MOLECULE_ERROR_MESSAGE": "Ich habe keine Informationen für %s.",
             "PROPERTIES_ERROR_MESSAGE": "Ich habe keine Informationen über %s von %s.",
 
@@ -178,7 +182,8 @@ var newSessionHandlers = {
 
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
     "StartMolecules": function () {
-        this.emit(":ask", this.t("WELCOME_MESSAGE") + ' ' + this.t("HELP_MESSAGE"), this.t("HELP_MESSAGE"));
+        var question = Helpers.examples();
+        this.emit(":ask", this.t("WELCOME_MESSAGE") + ' ' + this.t("HELP_MESSAGE", question), this.t("HELP_MESSAGE", question));
     },
     "GetMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.QUESTION;
@@ -221,77 +226,85 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         var moleculeData = [];
         var _this = this;
 
-        Data.httpGet(moleculeName, function (result) {
+        if (!slots.MoleculeName && !slots.moleculeName.value) {
 
-            moleculeData = result.data;
+            speechOutput = this.t("MOLECULE_UNDEFINED");
+            this.emit(":ask", speechOutput);
 
-            var dataIndex = _.findIndex(moleculeData, function (mol) {
-                return mol.IUPACName.toLowerCase() == moleculeName.toLowerCase();
-            });
+        } else {
 
-            /**
-             * Handle molecule request
-             * **/
-            if (dataIndex != -1) {
+            Data.httpGet(moleculeName, function (result) {
+
+                moleculeData = result.data;
+
+                var dataIndex = _.findIndex(moleculeData, function (mol) {
+                    return mol.IUPACName.toLowerCase() == moleculeName.toLowerCase();
+                });
 
                 /**
-                 * Handle properties request
+                 * Handle molecule request
                  * **/
-                if (slots.Properties && slots.Properties.value) {
+                if (dataIndex != -1) {
 
-                    slots.Properties.value = Helpers.propertiesConverter(slots.Properties.value);
+                    /**
+                     * Handle properties request
+                     * **/
+                    if (slots.Properties && slots.Properties.value) {
 
-                    var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
-                        return prop.valueTitle.toLowerCase() == slots.Properties.value.toLowerCase();
-                    });
+                        slots.Properties.value = Helpers.propertiesConverter(slots.Properties.value);
 
-                    if (propertiesIndex == -1) {
-                        speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
-                    } else {
-                        var properties = moleculeData[dataIndex].properties[propertiesIndex];
-                        if (properties.valueTitle == "Density" || properties.valueTitle == "Molar mass") properties.valueData = Helpers.unitsToReadable(properties.valueData);
-                        speechOutput += _this.t("PROPERTIES", properties.valueTitle, moleculeName, properties.valueData);
+                        var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
+                            return prop.valueTitle.toLowerCase() == slots.Properties.value.toLowerCase();
+                        });
+
+                        if (propertiesIndex == -1) {
+                            speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", slots.Properties.value, moleculeName);
+                        } else {
+                            var properties = moleculeData[dataIndex].properties[propertiesIndex];
+                            if (properties.valueTitle == "Density" || properties.valueTitle == "Molar mass") properties.valueData = Helpers.unitsToReadable(properties.valueData);
+                            speechOutput += _this.t("PROPERTIES", properties.valueTitle, moleculeName, properties.valueData);
+                        }
+
                     }
 
+                    /**
+                     * Handle chemical formula request
+                     * **/
+                    if (slots.ChemicalFormula && slots.ChemicalFormula.value) {
+                        var chemicalFormulaLong = moleculeData[dataIndex].chemicalFormulaLong;
+                        var chemicalFormulaForSpeech = Helpers.chemicalFormulaToReadable(chemicalFormulaLong);
+                        speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormulaForSpeech);
+                    }
+
+                    /**
+                     * Handle description request
+                     * **/
+                    if (slots.Description && slots.Description.value) {
+                        var description = moleculeData[dataIndex].description;
+                        speechOutput += _this.t("DESCRIPTION", description);
+                    }
+
+                    /**
+                     * Handle speech is undefined
+                     * **/
+                    if (!speechOutput) {
+                        speechOutput += _this.t("NOTHING_FOUND");
+                    }
+
+                } else {
+                    speechOutput += _this.t("MOLECULE_UNDEFINED");
                 }
 
-                /**
-                 * Handle chemical formula request
-                 * **/
-                if (slots.ChemicalFormula && slots.ChemicalFormula.value) {
-                    var chemicalFormulaLong = moleculeData[dataIndex].chemicalFormulaLong;
-                    var chemicalFormulaForSpeech = Helpers.chemicalFormulaToReadable(chemicalFormulaLong);
-                    speechOutput += _this.t("CHEMICAL_FORMULA", slots.ChemicalFormula.value, moleculeName, chemicalFormulaForSpeech);
+                if (speechOutput) {
+                    repeatSpeechOut = speechOutput;
+                    _this.emit(":tell", speechOutput);
+                } else {
+                    repeatSpeechOut = _this.t("WELCOME_MESSAGE");
+                    _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
                 }
 
-                /**
-                 * Handle description request
-                 * **/
-                if (slots.Description && slots.Description.value) {
-                    var description = moleculeData[dataIndex].description;
-                    speechOutput += _this.t("DESCRIPTION", description);
-                }
-
-                /**
-                 * Handle speech is undefined
-                 * **/
-                if (!speechOutput) {
-                    speechOutput += _this.t("NOTHING_FOUND");
-                }
-
-            } else {
-                speechOutput += _this.t("MOLECULE_ERROR_MESSAGE", moleculeName);
-            }
-
-            if (speechOutput) {
-                repeatSpeechOut = speechOutput;
-                _this.emit(":ask", speechOutput);
-            } else {
-                repeatSpeechOut = _this.t("WELCOME_MESSAGE");
-                _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
-            }
-
-        });
+            });
+        }
     },
 
     /**
@@ -305,98 +318,106 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         var moleculeData = [];
         var _this = this;
 
-        Data.httpGet(moleculeName, function (result) {
+        if (!slots.MoleculeName && !slots.moleculeName.value) {
 
-            moleculeData = result.data;
+            speechOutput = this.t("MOLECULE_UNDEFINED");
+            this.emit(":ask", speechOutput);
 
-            var dataIndex = _.findIndex(moleculeData, function (mol) {
-                return mol.IUPACName.toLowerCase() == moleculeName.toLowerCase();
-            });
+        } else {
 
-            /**
-             * Handle molecule request
-             * **/
-            if (dataIndex != -1) {
+            Data.httpGet(moleculeName, function (result) {
+
+                moleculeData = result.data;
+
+                var dataIndex = _.findIndex(moleculeData, function (mol) {
+                    return mol.IUPACName.toLowerCase() == moleculeName.toLowerCase();
+                });
 
                 /**
-                 * Handle Solubility request
+                 * Handle molecule request
                  * **/
-                if (slots.SecondMoleculeName && slots.SecondMoleculeName.value) {
-                    var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
-                        return prop.valueTitle.toLowerCase() == "solubility";
-                    });
+                if (dataIndex != -1) {
 
-                    if (propertiesIndex == -1) {
-                        speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", "solubility", moleculeName);
-                    } else {
-                        var property = moleculeData[dataIndex].properties[propertiesIndex];
-                        var solubilityList = property.valueData.toLowerCase().split(', ');
+                    /**
+                     * Handle Solubility request
+                     * **/
+                    if (slots.SecondMoleculeName && slots.SecondMoleculeName.value) {
+                        var propertiesIndex = _.findIndex(moleculeData[dataIndex].properties, function (prop) {
+                            return prop.valueTitle.toLowerCase() == "solubility";
+                        });
 
-                        var solubleIndex = _.indexOf(solubilityList, secondMoleculeName.toLowerCase());
+                        if (propertiesIndex == -1) {
+                            speechOutput += _this.t("PROPERTIES_ERROR_MESSAGE", "solubility", moleculeName);
+                        } else {
+                            var property = moleculeData[dataIndex].properties[propertiesIndex];
+                            var solubilityList = property.valueData.toLowerCase().split(', ');
 
-                        if (solubleIndex == -1) {
+                            var solubleIndex = _.indexOf(solubilityList, secondMoleculeName.toLowerCase());
 
-                            if (_.includes(property.valueData, secondMoleculeName)) {
+                            if (solubleIndex == -1) {
 
-                                if (property.valueData.split(', ').length > 1) {
-                                    speechOutput += _this.t("SOLUBLE_MESSAGE", moleculeName, secondMoleculeName);
-                                } else {
-                                    if (property.valueData.split(' ').length > 1) {
-                                        speechOutput += _this.t("SOLUBLE_SINGLE_MESSAGE", moleculeName, property.valueData);
+                                if (_.includes(property.valueData, secondMoleculeName)) {
+
+                                    if (property.valueData.split(', ').length > 1) {
+                                        speechOutput += _this.t("SOLUBLE_MESSAGE", moleculeName, secondMoleculeName);
                                     } else {
-                                        speechOutput += _this.t("SOLUBLE_MESSAGE", moleculeName, secondMoleculeName, property.valueData);
+                                        if (property.valueData.split(' ').length > 1) {
+                                            speechOutput += _this.t("SOLUBLE_SINGLE_MESSAGE", moleculeName, property.valueData);
+                                        } else {
+                                            speechOutput += _this.t("SOLUBLE_MESSAGE", moleculeName, secondMoleculeName, property.valueData);
+                                        }
                                     }
+
+                                } else {
+
+                                    if (property.valueData.split(', ').length > 1) {
+                                        property.valueData = Helpers.replaceLastIndexWithComma(property.valueData);
+                                        speechOutput += _this.t("SOLUBILITY_NOT_FOUND", moleculeName, secondMoleculeName, moleculeName, property.valueData);
+                                    } else {
+                                        if (property.valueData.split(' ').length > 1) {
+                                            speechOutput += _this.t("SOLUBILITY_SINGLE_NOT_FOUND", moleculeName, secondMoleculeName, moleculeName, property.valueData);
+                                        } else {
+                                            speechOutput += _this.t("SOLUBILITY_NOT_FOUND", moleculeName, secondMoleculeName, moleculeName, property.valueData);
+                                        }
+                                    }
+
                                 }
 
                             } else {
-
-                                if (property.valueData.split(', ').length > 1) {
-                                    property.valueData = Helpers.replaceLastIndexWithComma(property.valueData);
-                                    speechOutput += _this.t("SOLUBILITY_NOT_FOUND", moleculeName, secondMoleculeName, moleculeName, property.valueData);
-                                } else {
-                                    if (property.valueData.split(' ').length > 1) {
-                                        speechOutput += _this.t("SOLUBILITY_SINGLE_NOT_FOUND", moleculeName, secondMoleculeName, moleculeName, property.valueData);
-                                    } else {
-                                        speechOutput += _this.t("SOLUBILITY_NOT_FOUND", moleculeName, secondMoleculeName, moleculeName, property.valueData);
-                                    }
-                                }
-
+                                speechOutput += _this.t("SOLUBLE_MESSAGE", moleculeName, secondMoleculeName, property.valueData);
                             }
-
-                        } else {
-                            speechOutput += _this.t("SOLUBLE_MESSAGE", moleculeName, secondMoleculeName, property.valueData);
                         }
+
                     }
 
+                    /**
+                     * Handle speech is undefined
+                     * **/
+                    if (!speechOutput) {
+                        speechOutput += _this.t("NOTHING_FOUND");
+                    }
+
+                    /**
+                     * Handle molecule is undefined
+                     * **/
+                } else {
+                    speechOutput += _this.t("MOLECULE_UNDEFINED");
                 }
 
-                /**
-                 * Handle speech is undefined
-                 * **/
-                if (!speechOutput) {
-                    speechOutput += _this.t("NOTHING_FOUND");
+                if (speechOutput) {
+                    repeatSpeechOut = speechOutput;
+                    _this.emit(":tell", speechOutput);
+
+                } else {
+                    /**
+                     * Welcome message
+                     * **/
+                    repeatSpeechOut = _this.t("WELCOME_MESSAGE");
+                    _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
                 }
 
-                /**
-                 * Handle molecule is undefined
-                 * **/
-            } else {
-                speechOutput += _this.t("MOLECULE_ERROR_MESSAGE", moleculeName);
-            }
-
-            if (speechOutput) {
-                repeatSpeechOut = speechOutput;
-                _this.emit(":ask", speechOutput);
-
-            } else {
-                /**
-                 * Welcome message
-                 * **/
-                repeatSpeechOut = _this.t("WELCOME_MESSAGE");
-                _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
-            }
-
-        });
+            });
+        }
     },
     "GetChemicalName": function (slots) {
 
@@ -405,46 +426,54 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
         var moleculeData = [];
         var _this = this;
 
-        Data.httpGet(chemicalFormula, function (result) {
+        if (!slots.ChemicalName && !slots.ChemicalName.value) {
 
-            moleculeData = result.data;
+            speechOutput = this.t("MOLECULE_UNDEFINED");
+            this.emit(":ask", speechOutput);
 
-            var dataIndex = _.findIndex(moleculeData, function (mol) {
-                return mol.chemicalFormula.toLowerCase() == chemicalFormula.toLowerCase();
-            });
+        } else {
 
-            /**
-             * Handle molecule request
-             * **/
-            if (dataIndex != -1) {
+            Data.httpGet(chemicalFormula, function (result) {
+
+                moleculeData = result.data;
+
+                var dataIndex = _.findIndex(moleculeData, function (mol) {
+                    return mol.chemicalFormula.toLowerCase() == chemicalFormula.toLowerCase();
+                });
 
                 /**
-                 * Handle chemical name request
+                 * Handle molecule request
                  * **/
-                if (slots.ChemicalName && slots.ChemicalName.value) {
-                    var chemicalName = moleculeData[dataIndex].IUPACName;
-                    speechOutput += _this.t("CHEMICAL_NAME", Helpers.chemicalFormulaToReadable(slots.ChemicalName.value), chemicalName);
+                if (dataIndex != -1) {
+
+                    /**
+                     * Handle chemical name request
+                     * **/
+                    if (slots.ChemicalName && slots.ChemicalName.value) {
+                        var chemicalName = moleculeData[dataIndex].IUPACName;
+                        speechOutput += _this.t("CHEMICAL_NAME", Helpers.chemicalFormulaToReadable(slots.ChemicalName.value), chemicalName);
+                    }
+
+                    /**
+                     * Handle molecule is undefined
+                     * **/
+                } else {
+                    speechOutput += _this.t("MOLECULE_UNDEFINED");
                 }
 
-                /**
-                 * Handle molecule is undefined
-                 * **/
-            } else {
-                speechOutput += _this.t("MOLECULE_ERROR_MESSAGE", chemicalFormula);
-            }
+                if (speechOutput) {
+                    repeatSpeechOut = speechOutput;
+                    _this.emit(":tell", speechOutput);
+                } else {
+                    /**
+                     * Welcome message
+                     * **/
+                    repeatSpeechOut = _this.t("WELCOME_MESSAGE");
+                    _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
+                }
 
-            if (speechOutput) {
-                repeatSpeechOut = speechOutput;
-                _this.emit(":ask", speechOutput);
-            } else {
-                /**
-                 * Welcome message
-                 * **/
-                repeatSpeechOut = _this.t("WELCOME_MESSAGE");
-                _this.emit(":ask", _this.t("WELCOME_MESSAGE"));
-            }
-
-        });
+            });
+        }
 
     },
     "AMAZON.HelpIntent": function () {

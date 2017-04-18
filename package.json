@@ -1,6 +1,6 @@
 {
   "name": "alexa-molecule-skill",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This repository adds new skills to Amazon Alexa",
   "main": "index.js",
   "scripts": {
