@@ -34,6 +34,8 @@ var languageString = {
     "en": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
+            "ALREADY_WELCOME_MESSAGE": "That's me. You can ask me about any Molecules",
+            "WELCOME_MESSAGE_REPEAT": "Go ahead ask me about any Molecules",
             "HELP_MESSAGE": "Try saying some thing like, %s",
 
             "PROPERTIES": "%s of %s is %s",
@@ -61,6 +63,8 @@ var languageString = {
     "en-US": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
+            "ALREADY_WELCOME_MESSAGE": "That's me. You can ask me about any Molecules",
+            "WELCOME_MESSAGE_REPEAT": "Go ahead ask me about any Molecules",
             "HELP_MESSAGE": "Try saying some thing like, %s",
 
             "PROPERTIES": "%s of %s is %s",
@@ -86,6 +90,8 @@ var languageString = {
     "en-GB": {
         "translation": {
             "WELCOME_MESSAGE": "Welcome to Molecule! You can ask me about any Molecules",
+            "ALREADY_WELCOME_MESSAGE": "That's me. You can ask me about any Molecules",
+            "WELCOME_MESSAGE_REPEAT": "Go ahead ask me about any Molecules",
             "HELP_MESSAGE": "Try saying some thing like, %s",
 
             "PROPERTIES": "%s of %s is %s",
@@ -111,6 +117,8 @@ var languageString = {
     "de-DE": {
         "translation": {
             "WELCOME_MESSAGE": "Willkommen bei Molecule! Du kannst mich nach irgendwelchen Molekülen fragen",
+            "ALREADY_WELCOME_MESSAGE": "Das bin ich, du kannst mich nach irgendwelchen Molecules fragen",
+            "WELCOME_MESSAGE_REPEAT": "Gehen Sie voran fragen mich nach irgendwelchen Molekülen",
             "HELP_MESSAGE": "Versuchen Sie, etwas zu sagen, %s",
 
             "PROPERTIES": "%s von %s Ist %s",
@@ -145,7 +153,11 @@ exports.handler = function (event, context) {
 var newSessionHandlers = {
     "LaunchRequest": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
-        this.emitWithState("StartMolecules");
+        if (this.event.session && !this.event.session.new) {
+            this.emit(":ask", this.t("ALREADY_WELCOME_MESSAGE"), this.t("WELCOME_MESSAGE_REPEAT"));
+        } else {
+            this.emitWithState("StartMolecules");
+        }
     },
     "StartMoleculeIntent": function () {
         this.handler.state = MOLECULE_ALEXA_STATE.START;
@@ -178,13 +190,17 @@ var newSessionHandlers = {
         this.emit(':tell', this.t("GOOD_BYE"));
     },
     "Unhandled": function () {
-        var speechOutput = this.t("NOTHING_FOUND");
-        this.emit(":ask", speechOutput, speechOutput);
+        this.emitWithState("StartMolecules");
     }
 };
 
 var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START, {
     "StartMolecules": function () {
+
+        if (this.event.session && !this.event.session.new) {
+            this.emit(":ask", this.t("ALREADY_WELCOME_MESSAGE"), this.t("WELCOME_MESSAGE_REPEAT"));
+        }
+
         var question = Helpers.examples();
         this.emit(":ask", this.t("WELCOME_MESSAGE") + ' ' + this.t("HELP_MESSAGE", question), this.t("HELP_MESSAGE", question));
     },
@@ -215,8 +231,7 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         this.emit(':tell', this.t("GOOD_BYE"));
     },
     "Unhandled": function () {
-        var speechOutput = this.t("NOTHING_FOUND");
-        this.emit(":ask", speechOutput, speechOutput);
+        this.emitWithState("StartMolecules");
     }
 });
 
@@ -516,7 +531,6 @@ var exampleMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.EXAM
         this.emit(':tell', this.t("GOOD_BYE"));
     },
     "Unhandled": function () {
-        var speechOutput = this.t("NOTHING_FOUND");
-        this.emit(":ask", speechOutput, speechOutput);
+        this.emitWithState("GetExamples");
     }
 });
