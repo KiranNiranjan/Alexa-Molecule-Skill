@@ -174,6 +174,9 @@ var newSessionHandlers = {
     'AMAZON.StopIntent': function () {
         this.emit(':tell', this.t("GOOD_BYE"));
     },
+    'AMAZON.CancelIntent': function () {
+        this.emit(':tell', this.t("GOOD_BYE"));
+    },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");
         this.emit(":ask", speechOutput, speechOutput);
@@ -206,6 +209,9 @@ var startMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.START,
         this.emit(":ask", this.t("HELP_MESSAGE", question), this.t("HELP_MESSAGE", question));
     },
     'AMAZON.StopIntent': function () {
+        this.emit(':tell', this.t("GOOD_BYE"));
+    },
+    'AMAZON.CancelIntent': function () {
         this.emit(':tell', this.t("GOOD_BYE"));
     },
     "Unhandled": function () {
@@ -483,6 +489,9 @@ var questionMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.QUE
     'AMAZON.StopIntent': function () {
         this.emit(':tell', this.t("GOOD_BYE"));
     },
+    'AMAZON.CancelIntent': function () {
+        this.emit(':tell', this.t("GOOD_BYE"));
+    },
     "Unhandled": function () {
         var speechOutput = this.t("NOTHING_FOUND");
         this.emit(":ask", speechOutput, speechOutput);
@@ -494,13 +503,16 @@ var exampleMoleculeHandlers = Alexa.CreateStateHandler(MOLECULE_ALEXA_STATE.EXAM
     "GetExamples": function () {
         var example = Helpers.examples();
         this.attributes["example"] = example;
-        this.emit(":ask", this.t("EXAMPLE", example), this.t("EXAMPLE", example));
+        this.emit(":tell", this.t("EXAMPLE", example), this.t("EXAMPLE", example));
     },
     "AMAZON.HelpIntent": function () {
         var question = Helpers.examples();
         this.emit(":ask", this.t("HELP_MESSAGE", question), this.t("HELP_MESSAGE", question));
     },
     'AMAZON.StopIntent': function () {
+        this.emit(':tell', this.t("GOOD_BYE"));
+    },
+    'AMAZON.CancelIntent': function () {
         this.emit(':tell', this.t("GOOD_BYE"));
     },
     "Unhandled": function () {
