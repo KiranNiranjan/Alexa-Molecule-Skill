@@ -6,7 +6,8 @@ This is a Alexa skill which help Alexa answer simple Molecule details like Bolli
 
 
 ## Examples
- 
+
+* Alexa, Open molecule props
 * Alexa, What is the Atomic Number for Nitrogen molecule
 * Alexa, Odor for Hydrogen cyanide
 * Alexa, Get the Density for Hydrazine molecule
